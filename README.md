@@ -16,8 +16,9 @@ git commit -m "Added build-tools for standard makefile as subtree"
 ```
 # If there is not a build-tools remote, add it
 git remote add -f build-tools git@github.com:drud/build-tools.git
-# Pull current build-tools
-git pull -s subtree build-tools master
+# Fetch/merge current build-tools (pull doesn't work if set to branch.autosetuprebase=always)
+git fetch build-tools
+git merge -s subtree build-tools/master
 ```
 
 ## Set up a Makefile to begin with
