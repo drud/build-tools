@@ -1,4 +1,4 @@
-# Makefile for a standard golang repo with associated container
+# Makefile for a standard repo with associated container
 
 ##### These variables need to be adjusted in most repositories #####
 
