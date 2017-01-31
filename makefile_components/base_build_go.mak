@@ -13,7 +13,7 @@ GOFILES = $(shell find $(SRC_DIRS) -name "*.go")
 
 BUILD_IMAGE ?= golang:1.7-alpine
 
-all: build
+BUILD_BASE_DIR ?= $$PWD
 
 build: linux darwin
 
@@ -24,6 +24,7 @@ linux darwin: $(GOFILES)
 	@docker run                                                            \
 	    -t                                                                \
 	    -u root:root                                             \
+	    -v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
 	    -v $$(pwd)/.go:/go                                                 \
 	    -v $$(pwd):/go/src/$(PKG)                                          \
 	    -v $$(pwd)/bin/$@:/go/bin                                     \
@@ -36,7 +37,7 @@ linux darwin: $(GOFILES)
 	        OS=$@                                                 \
 	        VERSION=$(VERSION)                                             \
 	        PKG=$(PKG)                                                     \
-	        ./build-tools/build-scripts/build_go.sh                                               \
+	        /build-tools/build-scripts/build_go.sh $(SRC_DIRS)                                              \
 	    "
 	@touch $@
 	@echo $(VERSION) >VERSION.txt
@@ -50,4 +51,4 @@ container-clean:
 	rm -rf .container-* .dockerfile* .push-* linux darwin container VERSION.txt .docker_image
 
 bin-clean:
-	rm -rf .go bin
+	rm -rf .go bin .tmp

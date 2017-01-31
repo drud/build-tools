@@ -26,3 +26,22 @@ git merge -s subtree build-tools/master
 * Copy the Makefile.example to "Makefile" in the root of your project
 * Edit the sub-Makefiles included
 * Update the variables at the top of the Makefile
+
+## Additional chores when installing:
+
+* Add the items from gitignore_example to your .gitignore
+* Update the project README.md to explain how to build - the target reminders in the paragraph below may be helpful.
+
+## Basic targets and capabilities
+
+Using this base will allow you to build with standard targets like build, test, container, push, clean:
+
+```
+make 
+make test
+make container
+make push
+make VERSION=0.3.0 container
+make VERSION=0.3.0 push
+make clean
+```

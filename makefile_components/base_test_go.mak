@@ -10,6 +10,7 @@ test: linux
 	@docker run                                                            \
 	    -t                                                                \
 	    -u root:root                                             \
+		-v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
 	    -v $$(pwd)/.go:/go                                                 \
 	    -v $$(pwd):/go/src/$(PKG)                                          \
 	    -v $$(pwd)/bin/linux:/go/bin                                     \
@@ -19,5 +20,5 @@ test: linux
 	    $(BUILD_IMAGE)                                                     \
 	    /bin/sh -c "                                                       \
 	        OS=linux                                                   \
-	        ./build-tools/build-scripts/test_go.sh $(SRC_DIRS)                                    \
+	        /build-tools/build-scripts/test_go.sh $(SRC_DIRS)                                    \
 	    "

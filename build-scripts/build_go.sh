@@ -34,7 +34,9 @@ fi
 export CGO_ENABLED=0
 export GOOS="${OS}"
 
-go install                                                         \
+TARGETS=$(for d in "$@"; do echo ./$d/...; done)
+
+go install                                                     \
     -installsuffix "static"                                        \
     -ldflags "-X ${PKG}/pkg/version.VERSION=${VERSION}"            \
-    ./...
+    $TARGETS
