@@ -4,23 +4,20 @@
 
 These tools add standard components (sub-makefiles and build scripts) as well as example starters for the Makefile and circle.yml.
 
-## Add build-tools to a Makefile
+## Add build-tools for the first time to a Makefile
 
-```
-git remote add -f build-tools git@github.com:drud/build-tools.git
-git merge -s ours --allow-unrelated-histories build-tools/master
-git read-tree --prefix=build-tools -u build-tools/master
-git commit -m "Added build-tools for standard makefile as subtree"
-```
+Download the [build_updates.sh](https://github.com/drud/build-tools/blob/master/build_updates.sh) script and run it in the directory where the build-tools should be added.
+
+Alternately, just download the latest release from https://github.com/drud/build-tools/releases/latest, extract it, rename it to build-tools, and commit the result.
+
 
 ## Update build-tools directory from this repository using subtree merge
 
+Run the build_update.sh script in the build-tools directory:
+
 ```
-# If there is not a build-tools remote, add it
-git remote add -f build-tools git@github.com:drud/build-tools.git
-# Fetch/merge current build-tools (pull doesn't work if set to branch.autosetuprebase=always)
-git fetch build-tools
-git merge -s subtree build-tools/master
+cd build-tools
+./build_update.sh
 ```
 
 ## Set up a Makefile to begin with
@@ -40,6 +37,8 @@ Using this base will allow you to build with standard targets like build, test, 
 
 ```
 make 
+make linux
+make darwin
 make test
 make container
 make push
