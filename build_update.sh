@@ -11,8 +11,6 @@ tarball_url="https://github.com/drud/build-tools/archive/$tag.tar.gz"
 internal_name=build-tools-$tag
 local_file=/tmp/$internal_name.tgz
 
-set -x
-
 # If there is a current build-tools, get permission and remove
 if [ "${PWD##*/}" = "build-tools" ]; then
 	echo "OK to replace current build-tools at $PWD?"
