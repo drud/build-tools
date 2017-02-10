@@ -83,8 +83,8 @@ else
 	echo "PASS"
 	echo
 
-	echo -n "Checking vendorcheck -u for unused vendors:"
-	ERRS=$(vendorcheck -t -u  2>&1 || true)
+	echo -n "Checking for unused vendors:"
+	ERRS=$(govendor list +unused  2>&1 || true)
 	if [ -n "${ERRS}" ]; then
 		echo "FAIL"
 		echo "${ERRS}"
