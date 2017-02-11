@@ -46,3 +46,11 @@ make VERSION=0.3.0 container
 make VERSION=0.3.0 push
 make clean
 ```
+
+## Options
+
+The compile/build targets (linux/darwin) by default run "go vet", "go fmt" and "vendorcheck". This behavior can be overridden by setting the EXTENDED_CHECKS environment variable to 'false' or by specifying it on the make command line: `make EXTENDED_CHECKS=false`.
+
+## Golang compiler component
+
+golang projects are built in a container from drud/golang-build-container (from https://github.com/drud/golang-build-container). They pick up the "latest" tag by default, so that should be updated when we choose to move to a newer golang version.
