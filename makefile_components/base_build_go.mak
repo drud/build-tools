@@ -15,15 +15,20 @@ BUILD_IMAGE ?= drud/golang-build-container
 
 BUILD_BASE_DIR ?= $$PWD
 
+# Expands SRC_DIRS into the common golang ./dir/... format for "all below"
 SRC_AND_UNDER = $(patsubst %,./%/...,$(SRC_DIRS))
+
+VERSION_VARIABLES += VERSION
+
+VERSION_LDFLAGS := -ldflags '$(foreach v,$(VERSION_VARIABLES),-X $(PKG)/pkg/version.$(v)=$($(v)))'
 
 build: linux darwin
 
 linux darwin: $(GOFILES)
-	@echo "building $@ from $(GOFILES)"
+	@echo "building $@ from $(SRC_AND_UNDER)"
 	@rm -f VERSION.txt
 	@mkdir -p bin/$@
-	@docker run                                                            \
+	docker run                                                            \
 	    -t                                                                \
 	    -u root:root                                             \
 	    -v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
@@ -33,13 +38,13 @@ linux darwin: $(GOFILES)
 	    -v $$(pwd)/bin/$@:/go/bin/$@                      \
 	    -v $$(pwd)/.go/std/$@:/usr/local/go/pkg/$@_amd64_static  \
 	    -e GOOS=$@	\
-	    -w /go/src/$(PKG)                                                  \
-	    $(BUILD_IMAGE)                                                     \
-	    /bin/sh -c "                                                       \
-	        OS=$@                                                 \
-	        VERSION=$(VERSION)                                             \
-	        PKG=$(PKG)                                                     \
-	        /build-tools/build-scripts/build_go.sh $(SRC_DIRS)                                              \
+	    -w /go/src/$(PKG)                 \
+	    $(BUILD_IMAGE)                    \
+	    /bin/sh -c "                      \
+	        GOOS=$@                       \
+	        go install -installsuffix 'static'   \
+                $(VERSION_LDFLAGS) \
+                $(SRC_AND_UNDER)  \
 	    "
 	@touch $@
 	@echo $(VERSION) >VERSION.txt
@@ -105,3 +110,6 @@ container-clean:
 
 bin-clean:
 	rm -rf .go bin .tmp
+
+# print-ANYVAR prints the expanded variable
+print-%: ; @echo $* = $($*)

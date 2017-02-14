@@ -4,6 +4,8 @@
 ##### contents into ../Makefile and commenting out the include and adding a
 ##### comment about what you did and why.
 
+TESTOS = $(shell uname -s | tr '[:upper:]' '[:lower:]')
+
 test: linux
 	@mkdir -p bin/linux
 	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
@@ -19,6 +21,6 @@ test: linux
 	    -e GOOS=linux	\
 	    $(BUILD_IMAGE)                                                     \
 	    /bin/sh -c "                                                       \
-	        OS=linux                                                   \
-	        /build-tools/build-scripts/test_go.sh $(SRC_DIRS)                                    \
+	        GOOS=$(TESTOS)                                                   \
+	        go test -v -installsuffix "static" ${TARGETS} $(SRC_AND_BELOW)   \
 	    "
