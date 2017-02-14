@@ -33,7 +33,6 @@ linux darwin: $(GOFILES)
 	    -v $$(pwd)/bin/$@:/go/bin/$@                      \
 	    -v $$(pwd)/.go/std/$@:/usr/local/go/pkg/$@_amd64_static  \
 	    -e GOOS=$@	\
-	    -e EXTENDED_CHECKS=$(EXTENDED_CHECKS)    \
 	    -w /go/src/$(PKG)                                                  \
 	    $(BUILD_IMAGE)                                                     \
 	    /bin/sh -c "                                                       \
