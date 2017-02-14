@@ -20,7 +20,7 @@ SRC_AND_UNDER = $(patsubst %,./%/...,$(SRC_DIRS))
 
 VERSION_VARIABLES += VERSION
 
-VERSION_LDFLAGS := -ldflags '$(foreach v,$(VERSION_VARIABLES),-X $(PKG)/pkg/version.$(v)=$($(v)))'
+VERSION_LDFLAGS := -ldflags "$(foreach v,$(VERSION_VARIABLES),-X $(PKG)/pkg/version.$(v)=$($(v)))"
 
 build: linux darwin
 
@@ -28,7 +28,7 @@ linux darwin: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@rm -f VERSION.txt
 	@mkdir -p bin/$@
-	docker run                                                            \
+	@docker run                                                            \
 	    -t                                                                \
 	    -u root:root                                             \
 	    -v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
@@ -40,19 +40,19 @@ linux darwin: $(GOFILES)
 	    -e GOOS=$@	\
 	    -w /go/src/$(PKG)                 \
 	    $(BUILD_IMAGE)                    \
-	    /bin/sh -c "                      \
+	    /bin/sh -c '                      \
 	        GOOS=$@                       \
 	        go install -installsuffix 'static'   \
                 $(VERSION_LDFLAGS) \
                 $(SRC_AND_UNDER)  \
-	    "
+	    '
 	@touch $@
 	@echo $(VERSION) >VERSION.txt
 
 static: vendorcheck gofmt govet lint
 
 vendorcheck:
-	echo -n "Checking vendorcheck for missing dependencies and unused dependencies: "
+	@echo -n "Checking vendorcheck for missing dependencies and unused dependencies: "
 	@docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \
@@ -64,7 +64,7 @@ vendorcheck:
                  	    bash -c 'OUT=$$(vendorcheck ./... && govendor list +unused); if [ -n "$$OUT" ]; then echo "$$OUT"; exit 1; fi'
 
 gofmt:
-	echo -n "Checking gofmt: "
+	@echo -n "Checking gofmt: "
 	@docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \
@@ -76,7 +76,7 @@ gofmt:
                  	    bash -c 'gofmt -l $(SRC_DIRS)'
 
 govet:
-	echo -n "Checking go vet: "
+	@echo -n "Checking go vet: "
 	docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \
@@ -88,7 +88,7 @@ govet:
                  	    bash -c 'go vet $(SRC_AND_UNDER)'
 
 golint:
-	echo -n "Checking golint: "
+	@echo -n "Checking golint: "
 	docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \

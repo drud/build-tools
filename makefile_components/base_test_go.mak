@@ -9,7 +9,7 @@ TESTOS = $(shell uname -s | tr '[:upper:]' '[:lower:]')
 test: linux
 	@mkdir -p bin/linux
 	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
-	@docker run                                                            \
+	docker run                                                            \
 	    -t                                                                \
 	    -u root:root                                             \
 		-v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
@@ -18,9 +18,8 @@ test: linux
 	    -v $$(pwd)/bin/linux:/go/bin                                     \
 	    -v $$(pwd)/.go/std/linux:/usr/local/go/pkg/linux_amd64_static  \
 	    -w /go/src/$(PKG)                                                  \
-	    -e GOOS=linux	\
 	    $(BUILD_IMAGE)                                                     \
-	    /bin/sh -c "                                                       \
-	        GOOS=$(TESTOS)                                                   \
-	        go test -v -installsuffix "static" ${TARGETS} $(SRC_AND_BELOW)   \
-	    "
+	    /bin/bash -c '                                                    \
+	        GOOS=`uname -s |  tr '[:upper:]' '[:lower:]'`  && echo GOOS=$$GOOS &&		\
+	        go test -v -installsuffix "static" $(VERSION_LDFLAGS) $(SRC_AND_UNDER)   \
+	    '
