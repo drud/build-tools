@@ -12,7 +12,6 @@ test: linux
 	docker run                                                            \
 	    -t                                                                \
 	    -u root:root                                             \
-		-v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
 	    -v $$(pwd)/.go:/go                                                 \
 	    -v $$(pwd):/go/src/$(PKG)                                          \
 	    -v $$(pwd)/bin/linux:/go/bin                                     \

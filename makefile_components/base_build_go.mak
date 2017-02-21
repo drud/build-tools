@@ -31,13 +31,11 @@ linux darwin: $(GOFILES)
 	@docker run                                                            \
 	    -t                                                                \
 	    -u root:root                                             \
-	    -v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
 	    -v $$(pwd)/.go:/go                                                 \
 	    -v $$(pwd):/go/src/$(PKG)                                          \
 	    -v $$(pwd)/bin/$@:/go/bin                                     \
 	    -v $$(pwd)/bin/$@:/go/bin/$@                      \
 	    -v $$(pwd)/.go/std/$@:/usr/local/go/pkg/$@_amd64_static  \
-	    -e GOOS=$@	\
 	    -w /go/src/$(PKG)                 \
 	    $(BUILD_IMAGE)                    \
 	    /bin/sh -c '                      \
@@ -56,7 +54,6 @@ vendorcheck:
 	@docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \
-                 	    -v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
                  	    -v $$(pwd)/.go:/go                                                 \
                  	    -v $$(pwd):/go/src/$(PKG)                                          \
                  	    -w /go/src/$(PKG)                                                  \
@@ -68,7 +65,6 @@ gofmt:
 	@docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \
-                 	    -v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
                  	    -v $$(pwd)/.go:/go                                                 \
                  	    -v $$(pwd):/go/src/$(PKG)                                          \
                  	    -w /go/src/$(PKG)                                                  \
@@ -80,7 +76,6 @@ govet:
 	docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \
-                 	    -v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
                  	    -v $$(pwd)/.go:/go                                                 \
                  	    -v $$(pwd):/go/src/$(PKG)                                          \
                  	    -w /go/src/$(PKG)                                                  \
@@ -92,7 +87,6 @@ golint:
 	docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \
-                 	    -v $(BUILD_BASE_DIR)/build-tools:/build-tools		\
                  	    -v $$(pwd)/.go:/go                                                 \
                  	    -v $$(pwd):/go/src/$(PKG)                                          \
                  	    -w /go/src/$(PKG)                                                  \
