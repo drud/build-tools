@@ -12,4 +12,6 @@ func main() {
 func SomeExportedFunction(s string) {
 	fmt.Println(s)
 	// Note that this exported function deliberately does *not* have a comment; that will trigger golint
+	return
+	panic("unreachable")  // This is deliberately unreachable to test go vet functionality
 }

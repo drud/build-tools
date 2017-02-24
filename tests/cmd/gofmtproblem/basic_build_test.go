@@ -144,3 +144,20 @@ func TestGoLint(t *testing.T) {
 	v, err = exec.Command("make",  "SRC_DIRS=pkg", "golint").Output()
 	assert.NoError(err) // Should have one complaint about gofmtproblem.go
 }
+
+
+// Test govet for simple problems
+func TestGoVet(t *testing.T) {
+	assert := assert.New(t)
+
+	// cmd/gofmtproblem/gofmtproblem.go
+	// Test "make govet"
+	v, err := exec.Command("make", "govet").Output()
+	assert.Error(err) // Should have one complaint about gofmtproblem.go
+	assert.Contains(string(v), "cmd/gofmtproblem/gofmtproblem.go")
+
+	// Test "make SRC_DIRS=pkg govet" to limit to just clean directories
+	v, err = exec.Command("make",  "SRC_DIRS=pkg", "govet").Output()
+	assert.NoError(err) // Should have one complaint about gofmtproblem.go
+
+}
