@@ -58,7 +58,7 @@ vendorcheck:
                  	    -v $$(pwd):/go/src/$(PKG)                                          \
                  	    -w /go/src/$(PKG)                                                  \
                  	    $(BUILD_IMAGE)                                                     \
-                 	    bash -c 'OUT=$$(vendorcheck ./... && govendor list +unused); if [ -n "$$OUT" ]; then echo "$$OUT"; exit 1; fi'
+                 	    bash -c 'OUT=$$(govendor list +missing +unused); if [ -n "$$OUT" ]; then echo "$$OUT"; exit 1; fi'
 
 gofmt:
 	@echo "Checking gofmt: "
