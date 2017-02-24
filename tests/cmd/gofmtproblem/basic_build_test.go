@@ -4,21 +4,24 @@ import (
 	"os/exec"
 	"testing"
 
+	"fmt"
 	"github.com/drud/build-tools/tests/pkg/version"
 	"github.com/stretchr/testify/assert"
-	"strings"
 	"log"
+	"os"
+	"strings"
 )
 
 var (
 	osname = "" // The operating system.
 )
 
-
 func init() {
+	os.Chdir("../..")
+
 	// Operating system - Darwin or Linux
 	v, err := exec.Command("uname", "-s").Output()
-	if (err != nil) {
+	if err != nil {
 		log.Fatalln("Failed to run uname command:", string(v))
 	}
 	osname = strings.TrimSpace(string(v))
@@ -27,7 +30,7 @@ func init() {
 // Runs a number of standard make targets and test for basic sanity of result
 // Assumes operation in the "testing" directory where the Makefile is
 func TestMake(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	// Map OS name to output location
 	binlocs := map[string]string{
@@ -35,44 +38,55 @@ func TestMake(t *testing.T) {
 		"Linux":  "bin/linux",
 	}
 
+	dir, _ := os.Getwd()
+	fmt.Println("Current Directory:", dir)
 
 	v, err := exec.Command("which", "make").Output()
-	assert.Contains(string(v), "make")
+	a.Contains(string(v), "make")
 
 	// Try trivial "make version"
 	v, err = exec.Command("make", "version").Output()
-	assert.NoError(err)
-	assert.Contains(string(v), "VERSION:" + version.VERSION)
+	a.NoError(err)
+	a.Contains(string(v), "VERSION:"+version.VERSION)
+	if err != nil {
+		log.Fatalln("make version in", dir, "failed, so exiting. output=", string(v))
+	}
 
 	// Run a make clean to start with
 	v, err = exec.Command("make", "clean").Output()
-	assert.NoError(err)
+	a.NoError(err)
 
 	// Build darwin and linux cmds
 	v, err = exec.Command("make", "darwin").Output()
-	assert.NoError(err)
-	assert.Contains(string(v), "building darwin")
+	a.NoError(err)
+	a.Contains(string(v), "building darwin")
 
 	v, err = exec.Command("make", "linux").Output()
-	assert.NoError(err)
-	assert.Contains(string(v), "building linux")
+	a.NoError(err)
+	a.Contains(string(v), "building linux")
 
 	// Run the native gofmtproblem application to make sure it runs
 	v, err = exec.Command(binlocs[osname] + "/gofmtproblem").Output()
-	assert.Contains(string(v), "This is gofmtproblem.go")
-	assert.Contains(string(v), version.VERSION)
+	a.Contains(string(v), "This is gofmtproblem.go")
+	a.Contains(string(v), version.VERSION)
 
 	// Make container
 	v, err = exec.Command("make", "container").Output()
-	assert.Contains(string(v), "Successfully built")
+	a.Contains(string(v), "Successfully built")
 
 }
 
+// Try gofmt - it should fail with specific gofmtproblem.go complaint
 func TestGoFmt(t *testing.T) {
 	assert := assert.New(t)
 
 	// Test "make gofmt
-	v, _ := exec.Command("make", "gofmt").Output()
-	// assert.Error(err) // TODO: This should have an error because we have actual gofmt problems
+	v, err := exec.Command("make", "gofmt").Output()
+	assert.Error(err) // We should have an error with gfmtproblem.go
 	assert.Contains(string(v), "gofmtproblem.go")
+
+	// Test "make SRC_DIRS=pkg/clean gofmt" - has no errors
+	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "gofmt").Output()
+	assert.NoError(err) // We should have an error with gfmtproblem.go
+
 }

@@ -61,15 +61,15 @@ vendorcheck:
                  	    bash -c 'OUT=$$(vendorcheck ./... && govendor list +unused); if [ -n "$$OUT" ]; then echo "$$OUT"; exit 1; fi'
 
 gofmt:
-	@echo -n "Checking gofmt: "
+	@echo "Checking gofmt: "
 	@docker run                                                            \
-                 	    -t                                                                \
-                 	    -u root:root                                             \
-                 	    -v $$(pwd)/.go:/go                                                 \
-                 	    -v $$(pwd):/go/src/$(PKG)                                          \
-                 	    -w /go/src/$(PKG)                                                  \
-                 	    $(BUILD_IMAGE)                                                     \
-                 	    bash -c 'gofmt -l $(SRC_DIRS)'
+		-t                                                                \
+		-u root:root                                             \
+		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd):/go/src/$(PKG)                                          \
+		-w /go/src/$(PKG)                                                  \
+		$(BUILD_IMAGE)                                                     \
+		bash -c 'export OUT=$$(gofmt -l $(SRC_DIRS))  && if [ -n "$$OUT" ]; then echo "These files need gofmt -w: $$OUT"; exit 1; fi'
 
 govet:
 	@echo -n "Checking go vet: "

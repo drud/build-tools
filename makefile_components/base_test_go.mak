@@ -19,6 +19,6 @@ test: linux
 	    -w /go/src/$(PKG)                                                  \
 	    $(BUILD_IMAGE)                                                     \
 	    /bin/bash -c '                                                    \
-	        GOOS=`uname -s |  tr '[:upper:]' '[:lower:]'`  && echo GOOS=$$GOOS &&		\
+	        GOOS=`uname -s |  tr '[:upper:]' '[:lower:]'`  &&		\
 	        go test -v -installsuffix "static" $(VERSION_LDFLAGS) $(SRC_AND_UNDER)   \
 	    '

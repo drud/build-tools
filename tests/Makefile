@@ -11,6 +11,8 @@ DOCKER_REPO ?= drud/build-tools-test
 # Upstream repo used in the Dockerfile
 UPSTREAM_REPO ?= golang:1.7.5-alpine3.5
 
+export WORKING_DIR = $(shell pwd)
+
 # Top-level directories to build
 SRC_DIRS := cmd pkg
 
@@ -43,3 +45,9 @@ include ../makefile_components/base_container.mak
 include ../makefile_components/base_push.mak
 include ../makefile_components/base_test_go.mak
 #include ../makefile_components/base_test_python.mak
+
+# Override test because this one actually uses 'make' and counts on resources unavailable in golang compiler container
+test: linux darwin
+	@mkdir -p bin/linux
+	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
+	go test -v -installsuffix "static" $(VERSION_LDFLAGS) $(SRC_AND_UNDER)
