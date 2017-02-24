@@ -91,37 +91,37 @@ func TestGoFmt(t *testing.T) {
 
 }
 
-// Use vendorcheck with extra and missing items
-func TestVendorCheck(t *testing.T) {
+// Use govendor with extra and missing items
+func TestGovendor(t *testing.T) {
 	assert := assert.New(t)
 
 	simpleExtraPackage := "golang.org/x/net/context"
 	neededPackage := "github.com/stretchr/testify/assert"
 
-	// Test "make vendorcheck"
-	_, err := exec.Command("make", "vendorcheck").Output()
+	// Test "make govendor"
+	_, err := exec.Command("make", "govendor").Output()
 	assert.NoError(err) // Base code should have no errors
 
-	// Add an unused vendor item (net/context) and check that our vendorcheck now fails
+	// Add an unused vendor item (net/context) and check that our govendor now fails
 	_, err = exec.Command("govendor", "fetch", simpleExtraPackage).Output()
 	assert.NoError(err)
 
-	v, err := exec.Command("make", "vendorcheck").Output()
+	v, err := exec.Command("make", "govendor").Output()
 	assert.Error(err) // We should have an error now, with unused item
 	assert.Contains(string(v), "u " + simpleExtraPackage)
 
 	// Remove the extra item
 	_, err = exec.Command("govendor", "remove", simpleExtraPackage).Output()
 	assert.NoError(err)
-	// Test "make vendorcheck" - should be back to no errors
-	_, err = exec.Command("make", "vendorcheck").Output()
+	// Test "make govendor" - should be back to no errors
+	_, err = exec.Command("make", "govendor").Output()
 	assert.NoError(err) // Base code should have no errors
 
 	// Remove a necessary package
 	_, err = exec.Command("govendor", "remove", neededPackage).Output()
 	assert.NoError(err)
-	// Test "make vendorcheck" - should show assert as a missing item
-	v, err = exec.Command("make", "vendorcheck").Output()
+	// Test "make govendor" - should show assert as a missing item
+	v, err = exec.Command("make", "govendor").Output()
 	assert.Error(err)
 	assert.Contains(string(v), "m " + neededPackage)
 

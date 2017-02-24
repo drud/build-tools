@@ -5,7 +5,7 @@
 ##### comment about what you did and why.
 
 
-.PHONY: all build test push clean container-clean bin-clean version static vendorcheck gofmt govet golint
+.PHONY: all build test push clean container-clean bin-clean version static govendor gofmt govet golint
 
 SHELL := /bin/bash
 
@@ -47,10 +47,10 @@ linux darwin: $(GOFILES)
 	@touch $@
 	@echo $(VERSION) >VERSION.txt
 
-static: vendorcheck gofmt govet lint
+static: govendor gofmt govet lint
 
-vendorcheck:
-	@echo -n "Checking vendorcheck for missing dependencies and unused dependencies: "
+govendor:
+	@echo -n "Using govendor to check for missing dependencies and unused dependencies: "
 	@docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \
