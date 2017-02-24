@@ -52,8 +52,8 @@ func TestMake(t *testing.T) {
 		log.Fatalln("make version in", dir, "failed, so exiting. output=", string(v))
 	}
 
-	// Run a make clean to start with
-	v, err = exec.Command("make", "clean").Output()
+	// Run a make clean to start with; linux requires sudo because container left things a mess
+	v, err = exec.Command("sudo","make", "clean").Output()
 	a.NoError(err)
 
 	// Build darwin and linux cmds

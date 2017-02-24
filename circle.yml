@@ -2,9 +2,11 @@ version: 2
 executorType: machine
 stages:
   build:
-    workDir: ~/bootstrap
+    workDir: ~/build-tools
+
     environment:
       GOPATH: /home/circleci
+
     steps:
       - type: checkout
 
@@ -12,23 +14,19 @@ stages:
       - type: shell
         command: |
           mkdir -p ~/src/github.com/drud &&
-          ln -s ~/bootstrap ~/src/github.com/drud/bootstrap &&
-          cd  ~/src/github.com/drud/bootstrap/cli &&
-          pwd
+          ln -s ~/build-tools ~/src/github.com/drud/build-tools
         name: Set up directory structure
 
-      # Build drud and move it into /usr/local/bin - tests look for it in $PATH
+      # Build linux outputs
       - type: shell
         command: |
-          cd  ~/src/github.com/drud/bootstrap/cli &&
-          make GOPATH=~/ linux &&
-          sudo cp bin/linux/drud /usr/local/bin/
-        name: Build the linux drud executable binary
+          cd  ~/src/github.com/drud/build-tools/tests &&
+          make GOPATH=~/ linux
+        name: Build linux outputs
 
       # Run the tests
       - type: shell
-        command: make test
-
-      # Static analysis, vendorcheck, etc.
-      - type: shell
-        command: make vendorcheck gofmt govet
+        command: |
+          cd  ~/src/github.com/drud/build-tools/tests &&
+          make GOPATH=~/ test
+        name: make test
