@@ -91,6 +91,7 @@ func TestGoFmt(t *testing.T) {
 
 }
 
+// Use vendorcheck with extra and missing items
 func TestVendorCheck(t *testing.T) {
 	assert := assert.New(t)
 
@@ -127,4 +128,19 @@ func TestVendorCheck(t *testing.T) {
 	_, err = exec.Command("govendor", "fetch", neededPackage).Output()
 	assert.NoError(err)
 
+}
+
+
+// Test golint on clean and unclean code
+func TestGoLint(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test "make golint"
+	v, err := exec.Command("make", "golint").Output()
+	assert.Error(err) // Should have one complaint about gofmtproblem.go
+	assert.Contains(string(v), "exported function SomeExportedFunction should have comment")
+
+	// Test "make SRC_DIRS=pkg golint" to limit to just clean directories
+	v, err = exec.Command("make",  "SRC_DIRS=pkg", "golint").Output()
+	assert.NoError(err) // Should have one complaint about gofmtproblem.go
 }

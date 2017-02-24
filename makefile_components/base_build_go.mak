@@ -91,7 +91,7 @@ golint:
                  	    -v $$(pwd):/go/src/$(PKG)                                          \
                  	    -w /go/src/$(PKG)                                                  \
                  	    $(BUILD_IMAGE)                                                     \
-                 	    bash -c 'golint $(SRC_AND_UNDER)'
+                 	    bash -c 'export OUT=$$(golint $(SRC_AND_UNDER)) && if [ -n "$$OUT" ]; then echo "Golint problems discovered: $$OUT"; exit 1; fi'
 
 
 version:
