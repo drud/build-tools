@@ -46,8 +46,23 @@ include ../makefile_components/base_push.mak
 include ../makefile_components/base_test_go.mak
 #include ../makefile_components/base_test_python.mak
 
-# Override test because this one actually uses 'make' and counts on resources unavailable in golang compiler container
-test: linux darwin
+
+# We can't use the standard 'test' target because this one actually uses 'make' and counts on resources unavailable in
+# golang compiler container.
+noncontainer_test: linux darwin
 	@mkdir -p bin/linux
 	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
 	go test -v -installsuffix "static" $(VERSION_LDFLAGS) $(SRC_AND_UNDER)
+
+# Simple way to execute a random command in the container for tests - used only for testing
+# Example: make COMMAND="govendor fetch golang.org/x/net/context"
+COMMAND := govendor list
+container_cmd:
+	docker run                                                            \
+		-t                                                                \
+		-u root:root                                             \
+		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd):/go/src/$(PKG)                                          \
+		-w /go/src/$(PKG)                                                  \
+		$(BUILD_IMAGE)                                                     \
+		bash -c "$(COMMAND)"

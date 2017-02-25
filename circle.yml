@@ -28,5 +28,5 @@ stages:
       - type: shell
         command: |
           cd  ~/src/github.com/drud/build-tools/tests &&
-          make GOPATH=~/ test
-        name: make test
+          make GOPATH=~/ noncontainer_test
+        name: make noncontainer_test

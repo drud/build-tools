@@ -58,7 +58,7 @@ func TestMake(t *testing.T) {
 
 	// Build darwin and linux cmds
 	v, err = exec.Command("make", "darwin").Output()
-	a.NoError(err)
+	a.NoError(err, "Failed to 'make darwin'")
 	a.Contains(string(v), "building darwin")
 
 	v, err = exec.Command("make", "linux").Output()
@@ -92,6 +92,10 @@ func TestGoFmt(t *testing.T) {
 }
 
 // Use govendor with extra and missing items
+// There is some danger here that failure can leave the vendor directory with changed items.
+// Note that the spare make target "make container_cmd" is used as a generic way to execute govendor in the container.
+// The COMMAND=some command argument to exec.Command() is an oddity - due to the way this argument is processed,
+// it must not be escaped.
 func TestGovendor(t *testing.T) {
 	assert := assert.New(t)
 
@@ -103,29 +107,29 @@ func TestGovendor(t *testing.T) {
 	assert.NoError(err) // Base code should have no errors
 
 	// Add an unused vendor item (net/context) and check that our govendor now fails
-	_, err = exec.Command("govendor", "fetch", simpleExtraPackage).Output()
-	assert.NoError(err)
+	v, err := exec.Command("make", "COMMAND=govendor fetch " + simpleExtraPackage, "container_cmd").Output()
+	assert.NoError(err, "Failed 'govendor fetch %v', result=%v", simpleExtraPackage, string(v))
 
-	v, err := exec.Command("make", "govendor").Output()
+	v, err = exec.Command("make", "govendor").Output()
 	assert.Error(err) // We should have an error now, with unused item
 	assert.Contains(string(v), "u " + simpleExtraPackage)
 
 	// Remove the extra item
-	_, err = exec.Command("govendor", "remove", simpleExtraPackage).Output()
+	_, err = exec.Command("make", "COMMAND=govendor remove "  + simpleExtraPackage, "container_cmd").Output()
 	assert.NoError(err)
 	// Test "make govendor" - should be back to no errors
 	_, err = exec.Command("make", "govendor").Output()
 	assert.NoError(err) // Base code should have no errors
 
 	// Remove a necessary package
-	_, err = exec.Command("govendor", "remove", neededPackage).Output()
+	_, err = exec.Command("make", "COMMAND=govendor remove "  + neededPackage, "container_cmd").Output()
 	assert.NoError(err)
 	// Test "make govendor" - should show assert as a missing item
 	v, err = exec.Command("make", "govendor").Output()
 	assert.Error(err)
 	assert.Contains(string(v), "m " + neededPackage)
 
-	_, err = exec.Command("govendor", "fetch", neededPackage).Output()
+	_, err = exec.Command("make", "COMMAND=govendor fetch "  + neededPackage, "container_cmd").Output()
 	assert.NoError(err)
 
 }

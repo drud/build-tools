@@ -52,13 +52,13 @@ static: govendor gofmt govet lint
 govendor:
 	@echo -n "Using govendor to check for missing dependencies and unused dependencies: "
 	@docker run                                                            \
-                 	    -t                                                                \
-                 	    -u root:root                                             \
-                 	    -v $$(pwd)/.go:/go                                                 \
-                 	    -v $$(pwd):/go/src/$(PKG)                                          \
-                 	    -w /go/src/$(PKG)                                                  \
-                 	    $(BUILD_IMAGE)                                                     \
-                 	    bash -c 'OUT=$$(govendor list +missing +unused); if [ -n "$$OUT" ]; then echo "$$OUT"; exit 1; fi'
+		-t                                                                \
+		-u root:root                                             \
+		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd):/go/src/$(PKG)                                          \
+		-w /go/src/$(PKG)                                                  \
+		$(BUILD_IMAGE)                                                     \
+		bash -c 'OUT=$$(govendor list +missing +unused); if [ -n "$$OUT" ]; then echo "$$OUT"; exit 1; fi'
 
 gofmt:
 	@echo "Checking gofmt: "
