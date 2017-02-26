@@ -1,4 +1,4 @@
-package buildTools
+package clean
 
 import (
 	"os/exec"
@@ -83,7 +83,7 @@ func TestGoFmt(t *testing.T) {
 	// Test "make gofmt
 	v, err := exec.Command("make", "gofmt").Output()
 	assert.Error(err) // We should have an error with bad_gofmt_code.go
-	assert.Contains(string(v), "pkg/buildTools/bad_gofmt_code.go")
+	assert.Contains(string(v), "pkg/dirtyComplex/bad_gofmt_code.go")
 
 	// Test "make SRC_DIRS=pkg/clean gofmt" - has no errors
 	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "gofmt").Output()
@@ -156,10 +156,26 @@ func TestGoVet(t *testing.T) {
 	// Test "make govet"
 	v, err := exec.Command("make", "govet").Output()
 	assert.Error(err) // Should have one complaint about gofmtproblem.go
-	assert.Contains(string(v), "pkg/buildTools/bad_govet_code.go")
+	assert.Contains(string(v), "pkg/dirtyComplex/bad_govet_code.go")
 
 	// Test "make SRC_DIRS=pkg govet" to limit to just clean directories
 	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "govet").Output()
 	assert.NoError(err) // Should have one complaint about gofmtproblem.go
 
+}
+
+// Try unit testing capability (make test) since we use an overridden target for complex tests
+func testMakeTest(t *testing.T) {
+	assert := assert.New(t)
+
+	// cmd/gofmtproblem/gofmtproblem.go
+	// Test "make govet"
+	v, err := exec.Command("make", "test").Output()
+	assert.Error(err) // Should have one complaint about ExampleFailingReverse
+	assert.Contains(string(v), "FAIL: ExampleFailingReverse")
+
+	// Try "make test" with just the clean package and nothing else
+	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "test").Output()
+	assert.NoError(err) // Should have no errors even though there's one test there
+	assert.Contains(string(v), "PASS: ExampleSuccessfulReverse")
 }

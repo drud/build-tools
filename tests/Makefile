@@ -13,8 +13,8 @@ UPSTREAM_REPO ?= golang:1.7.5-alpine3.5
 
 export WORKING_DIR = $(shell pwd)
 
-# Top-level directories to build
-SRC_DIRS := cmd pkg
+# Top-level directories to build - Only build the explicit complex fail stuff by default. Unit test will be overridden.
+SRC_DIRS := pkg/clean pkg/dirtyComplex cmd
 
 # Version variables to replace in build, The variable VERSION is automatically pulled from git committish so it doesn't have to be added
 # These are replaced in the $(PKG).version package.
