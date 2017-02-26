@@ -1,4 +1,4 @@
-package main
+package buildTools
 
 import (
 	"os/exec"
@@ -17,8 +17,8 @@ var (
 )
 
 func init() {
+	// Default directory is the directory of the test file, but we need to run make from the directory of the Makefile
 	os.Chdir("../..")
-
 	// Operating system - Darwin or Linux
 	v, err := exec.Command("uname", "-s").Output()
 	if err != nil {
@@ -29,7 +29,7 @@ func init() {
 
 // Runs a number of standard make targets and test for basic sanity of result
 // Assumes operation in the "testing" directory where the Makefile is
-func TestMake(t *testing.T) {
+func TestBuild(t *testing.T) {
 	a := assert.New(t)
 
 	// Map OS name to output location
@@ -44,7 +44,7 @@ func TestMake(t *testing.T) {
 	v, err := exec.Command("which", "make").Output()
 	a.Contains(string(v), "make")
 
-	// Try trivial "make version"
+	// Try trivial "make version". This does use local system's make and git commands
 	v, err = exec.Command("make", "version").Output()
 	a.NoError(err)
 	a.Contains(string(v), "VERSION:"+version.VERSION)
@@ -53,7 +53,7 @@ func TestMake(t *testing.T) {
 	}
 
 	// Run a make clean to start with; linux requires sudo because container left things a mess
-	v, err = exec.Command("sudo","make", "clean").Output()
+	v, err = exec.Command("sudo", "make", "clean").Output()
 	a.NoError(err)
 
 	// Build darwin and linux cmds
@@ -66,8 +66,8 @@ func TestMake(t *testing.T) {
 	a.Contains(string(v), "building linux")
 
 	// Run the native gofmtproblem application to make sure it runs
-	v, err = exec.Command(binlocs[osname] + "/gofmtproblem").Output()
-	a.Contains(string(v), "This is gofmtproblem.go")
+	v, err = exec.Command(binlocs[osname] + "/build_tools_dummy").Output()
+	a.Contains(string(v), "This is build_tools_dummy.go")
 	a.Contains(string(v), version.VERSION)
 
 	// Make container
@@ -82,12 +82,12 @@ func TestGoFmt(t *testing.T) {
 
 	// Test "make gofmt
 	v, err := exec.Command("make", "gofmt").Output()
-	assert.Error(err) // We should have an error with gfmtproblem.go
-	assert.Contains(string(v), "gofmtproblem.go")
+	assert.Error(err) // We should have an error with bad_gofmt_code.go
+	assert.Contains(string(v), "pkg/buildTools/bad_gofmt_code.go")
 
 	// Test "make SRC_DIRS=pkg/clean gofmt" - has no errors
 	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "gofmt").Output()
-	assert.NoError(err) // We should have an error with gfmtproblem.go
+	assert.NoError(err) // No error on the clean directory
 
 }
 
@@ -107,33 +107,32 @@ func TestGovendor(t *testing.T) {
 	assert.NoError(err) // Base code should have no errors
 
 	// Add an unused vendor item (net/context) and check that our govendor now fails
-	v, err := exec.Command("make", "COMMAND=govendor fetch " + simpleExtraPackage, "container_cmd").Output()
+	v, err := exec.Command("make", "COMMAND=govendor fetch "+simpleExtraPackage, "container_cmd").Output()
 	assert.NoError(err, "Failed 'govendor fetch %v', result=%v", simpleExtraPackage, string(v))
 
 	v, err = exec.Command("make", "govendor").Output()
 	assert.Error(err) // We should have an error now, with unused item
-	assert.Contains(string(v), "u " + simpleExtraPackage)
+	assert.Contains(string(v), "u "+simpleExtraPackage)
 
 	// Remove the extra item
-	_, err = exec.Command("make", "COMMAND=govendor remove "  + simpleExtraPackage, "container_cmd").Output()
+	_, err = exec.Command("make", "COMMAND=govendor remove "+simpleExtraPackage, "container_cmd").Output()
 	assert.NoError(err)
 	// Test "make govendor" - should be back to no errors
 	_, err = exec.Command("make", "govendor").Output()
 	assert.NoError(err) // Base code should have no errors
 
 	// Remove a necessary package
-	_, err = exec.Command("make", "COMMAND=govendor remove "  + neededPackage, "container_cmd").Output()
+	_, err = exec.Command("make", "COMMAND=govendor remove "+neededPackage, "container_cmd").Output()
 	assert.NoError(err)
 	// Test "make govendor" - should show assert as a missing item
 	v, err = exec.Command("make", "govendor").Output()
 	assert.Error(err)
-	assert.Contains(string(v), "m " + neededPackage)
+	assert.Contains(string(v), "m "+neededPackage)
 
-	_, err = exec.Command("make", "COMMAND=govendor fetch "  + neededPackage, "container_cmd").Output()
+	_, err = exec.Command("make", "COMMAND=govendor fetch "+neededPackage, "container_cmd").Output()
 	assert.NoError(err)
 
 }
-
 
 // Test golint on clean and unclean code
 func TestGoLint(t *testing.T) {
@@ -142,13 +141,12 @@ func TestGoLint(t *testing.T) {
 	// Test "make golint"
 	v, err := exec.Command("make", "golint").Output()
 	assert.Error(err) // Should have one complaint about gofmtproblem.go
-	assert.Contains(string(v), "exported function SomeExportedFunction should have comment")
+	assert.Contains(string(v), "exported function DummyExported_function should have comment")
 
 	// Test "make SRC_DIRS=pkg golint" to limit to just clean directories
-	v, err = exec.Command("make",  "SRC_DIRS=pkg", "golint").Output()
+	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "golint").Output()
 	assert.NoError(err) // Should have one complaint about gofmtproblem.go
 }
-
 
 // Test govet for simple problems
 func TestGoVet(t *testing.T) {
@@ -158,10 +156,10 @@ func TestGoVet(t *testing.T) {
 	// Test "make govet"
 	v, err := exec.Command("make", "govet").Output()
 	assert.Error(err) // Should have one complaint about gofmtproblem.go
-	assert.Contains(string(v), "cmd/gofmtproblem/gofmtproblem.go")
+	assert.Contains(string(v), "pkg/buildTools/bad_govet_code.go")
 
 	// Test "make SRC_DIRS=pkg govet" to limit to just clean directories
-	v, err = exec.Command("make",  "SRC_DIRS=pkg", "govet").Output()
+	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "govet").Output()
 	assert.NoError(err) // Should have one complaint about gofmtproblem.go
 
 }

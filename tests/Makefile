@@ -58,7 +58,7 @@ noncontainer_test: linux darwin
 # Example: make COMMAND="govendor fetch golang.org/x/net/context"
 COMMAND := govendor list
 container_cmd:
-	docker run                                                            \
+	@docker run                                                            \
 		-t                                                                \
 		-u root:root                                             \
 		-v $$(pwd)/.go:/go                                                 \

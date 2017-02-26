@@ -73,7 +73,7 @@ gofmt:
 
 govet:
 	@echo -n "Checking go vet: "
-	docker run                                                            \
+	@docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \
                  	    -v $$(pwd)/.go:/go                                                 \
@@ -84,7 +84,7 @@ govet:
 
 golint:
 	@echo -n "Checking golint: "
-	docker run                                                            \
+	@docker run                                                            \
                  	    -t                                                                \
                  	    -u root:root                                             \
                  	    -v $$(pwd)/.go:/go                                                 \
