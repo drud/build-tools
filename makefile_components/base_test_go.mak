@@ -6,7 +6,7 @@
 
 TESTOS = $(shell uname -s | tr '[:upper:]' '[:lower:]')
 
-test: linux
+test: build
 	@mkdir -p bin/linux
 	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
 	@docker run                                                            \

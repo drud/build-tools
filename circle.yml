@@ -24,16 +24,10 @@ stages:
           make GOPATH=~/ linux
         name: Build linux outputs
 
-      # Run the complex tests
+      # Run the "make test"
       - type: shell
         command: |
           cd  ~/src/github.com/drud/build-tools/tests &&
-          make GOPATH=~/ noncontainer_test
-        name: make noncontainer_test
-
-      # Run the simple unit tests
-      - type: shell
-        command: |
-          cd  ~/src/github.com/drud/build-tools/tests &&
-          make GOPATH=~/ SRC_DIRS=pkg/dirtyUnit test
+          make GOPATH=~/ SRC_DIRS="cmd pkg/clean pkg/dirtyComplex" test
         name: make test
+

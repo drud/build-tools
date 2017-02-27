@@ -14,7 +14,7 @@ UPSTREAM_REPO ?= golang:1.7.5-alpine3.5
 export WORKING_DIR = $(shell pwd)
 
 # Top-level directories to build - Only build the explicit complex fail stuff by default. Unit test will be overridden.
-SRC_DIRS := pkg/clean pkg/dirtyComplex cmd
+SRC_DIRS := cmd pkg/clean pkg/dirtyComplex
 
 # Version variables to replace in build, The variable VERSION is automatically pulled from git committish so it doesn't have to be added
 # These are replaced in the $(PKG).version package.
@@ -43,13 +43,13 @@ include ../makefile_components/base_build_go.mak
 #include ../makefile_components/base_build_python-docker.mak
 include ../makefile_components/base_container.mak
 include ../makefile_components/base_push.mak
-include ../makefile_components/base_test_go.mak
+#include ../makefile_components/base_test_go.mak
 #include ../makefile_components/base_test_python.mak
 
 
 # We can't use the standard 'test' target because this one actually uses 'make' and counts on resources unavailable in
 # golang compiler container.
-noncontainer_test: linux darwin
+test: build
 	@mkdir -p bin/linux
 	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
 	go test -v -installsuffix "static" $(VERSION_LDFLAGS) $(SRC_AND_UNDER)
@@ -66,3 +66,4 @@ container_cmd:
 		-w /go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
 		bash -c "$(COMMAND)"
+

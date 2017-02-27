@@ -168,14 +168,8 @@ func TestGoVet(t *testing.T) {
 func TestMakeTest(t *testing.T) {
 	assert := assert.New(t)
 
-	// cmd/gofmtproblem/gofmtproblem.go
-	// Test "make govet"
-	v, err := exec.Command("make", "test").Output()
+	// Try "make test" with unit tests
+	v, err := exec.Command("make", "SRC_DIRS=pkg/dirtyUnit", "test").Output()
 	assert.Error(err) // Should have one complaint about ExampleFailingReverse
-	assert.Contains(string(v), "FAIL: TestFailingReverse")
-
-	// Try "make test" with just the clean package and nothing else
-	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "test").Output()
-	assert.NoError(err) // Should have no errors even though there's one test there
-	assert.Contains(string(v), "PASS: TestSuccessfulReverse")
+	assert.Contains(string(v), "FAIL: TestFailingMath")
 }
