@@ -169,7 +169,13 @@ func TestMakeTest(t *testing.T) {
 	assert := assert.New(t)
 
 	// Try "make test" with unit tests
-	v, err := exec.Command("make", "SRC_DIRS=pkg/dirtyUnit", "test").Output()
+	v, err := exec.Command("make", "SRC_DIRS=pkg/dirtyUnit", "unittest").Output()
 	assert.Error(err) // Should have one complaint about ExampleFailingReverse
-	assert.Contains(string(v), "FAIL: TestFailingMath")
+	dir, _ := os.Getwd()
+	fmt.Println("Current Directory:", dir)
+	gopath := os.Getenv("GOPATH")
+	fmt.Println("GOPATH=", gopath)
+
+	fmt.Println("=======Captured output from make SRC_DIRS=pkg/dirtyUnit=", string(v), "=======")
+	assert.Contains(string(v), "FAIL: TestFailingMath", "Failed to find TestFailingMath in output=%v", string(v))
 }

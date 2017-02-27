@@ -54,6 +54,12 @@ test: build
 	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
 	go test -v -installsuffix "static" $(VERSION_LDFLAGS) $(SRC_AND_UNDER)
 
+# This target is a duplicate of test, but used because the build_tools_test.go, which is run by 'make test'
+# actually invokes 'make unittest' - if it invokes 'make test' on Linux it doesn't work correctly.
+unittest: build
+	go test -v -installsuffix "static" $(VERSION_LDFLAGS) $(SRC_AND_UNDER)
+
+
 # Simple way to execute a random command in the container for tests - used only for testing
 # Example: make COMMAND="govendor fetch golang.org/x/net/context"
 COMMAND := govendor list
