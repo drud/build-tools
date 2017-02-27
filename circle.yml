@@ -28,6 +28,6 @@ stages:
       - type: shell
         command: |
           cd  ~/src/github.com/drud/build-tools/tests &&
-          make GOPATH=~/ SRC_DIRS="cmd pkg/clean pkg/dirtyComplex" test
+          make GOPATH=~/ test
         name: make test
 

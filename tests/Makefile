@@ -14,7 +14,7 @@ UPSTREAM_REPO ?= golang:1.7.5-alpine3.5
 export WORKING_DIR = $(shell pwd)
 
 # Top-level directories to build - Only build the explicit complex fail stuff by default. Unit test will be overridden.
-SRC_DIRS := cmd pkg/clean pkg/dirtyComplex pkg/version
+SRC_DIRS := cmd pkg
 
 # Version variables to replace in build, The variable VERSION is automatically pulled from git committish so it doesn't have to be added
 # These are replaced in the $(PKG).version package.
@@ -53,12 +53,6 @@ test: build
 	@mkdir -p bin/linux
 	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
 	go test -v -installsuffix "static" $(VERSION_LDFLAGS) $(SRC_AND_UNDER)
-
-# This target is a duplicate of test, but used because the build_tools_test.go, which is run by 'make test'
-# actually invokes 'make unittest' - if it invokes 'make test' on Linux it doesn't work correctly.
-unittest: build
-	go test -v -installsuffix "static" $(VERSION_LDFLAGS) $(SRC_AND_UNDER)
-
 
 # Simple way to execute a random command in the container for tests - used only for testing
 # Example: make COMMAND="govendor fetch golang.org/x/net/context"

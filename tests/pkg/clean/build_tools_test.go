@@ -163,19 +163,3 @@ func TestGoVet(t *testing.T) {
 	assert.NoError(err) // Should have no complaints in clean package
 
 }
-
-// Try unit testing capability (make test) since we use an overridden target for complex tests
-func TestMakeTest(t *testing.T) {
-	assert := assert.New(t)
-
-	// Try "make test" with unit tests
-	v, err := exec.Command("make", "SRC_DIRS=pkg/dirtyUnit", "unittest").Output()
-	assert.Error(err) // Should have one complaint about ExampleFailingReverse
-	dir, _ := os.Getwd()
-	fmt.Println("Current Directory:", dir)
-	gopath := os.Getenv("GOPATH")
-	fmt.Println("GOPATH=", gopath)
-
-	fmt.Println("=======Captured output from make SRC_DIRS=pkg/dirtyUnit=", string(v), "=======")
-	assert.Contains(string(v), "FAIL: TestFailingMath", "Failed to find TestFailingMath in output=%v", string(v))
-}
