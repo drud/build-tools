@@ -9,12 +9,6 @@
 			"revisionTime": "2016-10-29T20:57:26Z"
 		},
 		{
-			"checksumSHA1": "tamKcOZfQ8E90Wg7/5saCnmFS6g=",
-			"path": "github.com/golang/example/stringutil",
-			"revision": "0dea2d0bf90754ffa40e0cb2f23b638f3e3d7e09",
-			"revisionTime": "2017-02-10T18:51:47Z"
-		},
-		{
 			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
 			"path": "github.com/pmezard/go-difflib/difflib",
 			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
