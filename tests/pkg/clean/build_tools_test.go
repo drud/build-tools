@@ -54,7 +54,7 @@ func TestBuild(t *testing.T) {
 
 	// Run a make clean to start with; linux requires sudo because container left things a mess
 	v, err = exec.Command("make", "clean").Output()
-	a.NoError(err)
+	a.NoError(err, "make clean failed. output=" + string(v))
 
 	// Build darwin and linux cmds
 	v, err = exec.Command("make", "darwin").Output()
