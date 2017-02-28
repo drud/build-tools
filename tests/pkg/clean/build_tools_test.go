@@ -54,7 +54,7 @@ func TestBuild(t *testing.T) {
 
 	// Run a make clean to start with; linux requires sudo because container left things a mess
 	v, err = exec.Command("make", "clean").Output()
-	a.NoError(err, "make clean failed. output=" + string(v))
+	a.NoError(err, "make clean failed. output="+string(v))
 
 	// Build darwin and linux cmds
 	v, err = exec.Command("make", "darwin").Output()
@@ -87,7 +87,7 @@ func TestGoFmt(t *testing.T) {
 
 	// Test "make SRC_DIRS=pkg/clean gofmt" - has no errors
 	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "gofmt").Output()
-	assert.NoError(err) // No error on the clean directory
+	assert.NoError(err, "make SRC_DIRS=pkg/clean gofmt failed: output="+string(v)) // No error on the clean directory
 
 }
 
