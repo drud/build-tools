@@ -53,7 +53,7 @@ func TestBuild(t *testing.T) {
 	}
 
 	// Run a make clean to start with; linux requires sudo because container left things a mess
-	v, err = exec.Command("sudo", "make", "clean").Output()
+	v, err = exec.Command("make", "clean").Output()
 	a.NoError(err)
 
 	// Build darwin and linux cmds

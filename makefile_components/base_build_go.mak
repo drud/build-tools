@@ -27,10 +27,10 @@ build: linux darwin
 linux darwin: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@rm -f VERSION.txt
-	@mkdir -p bin/$@
+	@mkdir -p bin/$@ .go/std/$@ .go/bin .go/src/$(PKG)
 	@docker run                                                            \
 	    -t                                                                \
-	    -u root:root                                             \
+	    -u $(id -u):$(id -g)                                             \
 	    -v $$(pwd)/.go:/go                                                 \
 	    -v $$(pwd):/go/src/$(PKG)                                          \
 	    -v $$(pwd)/bin/$@:/go/bin                                     \
