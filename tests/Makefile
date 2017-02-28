@@ -60,7 +60,7 @@ COMMAND := govendor list
 container_cmd:
 	@docker run                                                            \
 		-t                                                                \
-		-u root:root                                             \
+	    -u $(shell id -u):$(shell id -g)                                             \
 		-v $$(pwd)/.go:/go                                                 \
 		-v $$(pwd):/go/src/$(PKG)                                          \
 		-w /go/src/$(PKG)                                                  \
