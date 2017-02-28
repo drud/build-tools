@@ -11,7 +11,7 @@ test: build
 	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
 	@docker run                                                            \
 	    -t                                                                \
-	    -u root:root                                             \
+	    -u $(shell id -u):$(shell id -g)                                             \
 	    -v $$(pwd)/.go:/go                                                 \
 	    -v $$(pwd):/go/src/$(PKG)                                          \
 	    -v $$(pwd)/bin/linux:/go/bin                                     \

@@ -30,7 +30,7 @@ linux darwin: $(GOFILES)
 	@mkdir -p bin/$@ .go/std/$@ .go/bin .go/src/$(PKG)
 	@docker run                                                            \
 	    -t                                                                \
-	    -u $(id -u):$(id -g)                                             \
+	    -u $(shell id -u):$(shell id -g)                                             \
 	    -v $$(pwd)/.go:/go                                                 \
 	    -v $$(pwd):/go/src/$(PKG)                                          \
 	    -v $$(pwd)/bin/$@:/go/bin                                     \
@@ -53,7 +53,7 @@ govendor:
 	@echo -n "Using govendor to check for missing dependencies and unused dependencies: "
 	@docker run                                                            \
 		-t                                                                \
-		-u root:root                                             \
+	    -u $(shell id -u):$(shell id -g)                                             \
 		-v $$(pwd)/.go:/go                                                 \
 		-v $$(pwd):/go/src/$(PKG)                                          \
 		-w /go/src/$(PKG)                                                  \
@@ -64,7 +64,7 @@ gofmt:
 	@echo "Checking gofmt: "
 	@docker run                                                            \
 		-t                                                                \
-		-u root:root                                             \
+	    -u $(shell id -u):$(shell id -g)                                             \
 		-v $$(pwd)/.go:/go                                                 \
 		-v $$(pwd):/go/src/$(PKG)                                          \
 		-w /go/src/$(PKG)                                                  \
@@ -74,24 +74,24 @@ gofmt:
 govet:
 	@echo -n "Checking go vet: "
 	@docker run                                                            \
-                 	    -t                                                                \
-                 	    -u root:root                                             \
-                 	    -v $$(pwd)/.go:/go                                                 \
-                 	    -v $$(pwd):/go/src/$(PKG)                                          \
-                 	    -w /go/src/$(PKG)                                                  \
-                 	    $(BUILD_IMAGE)                                                     \
-                 	    bash -c 'go vet $(SRC_AND_UNDER)'
+		-t                                                                \
+		-u $(shell id -u):$(shell id -g)                                             \
+		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd):/go/src/$(PKG)                                          \
+		-w /go/src/$(PKG)                                                  \
+		$(BUILD_IMAGE)                                                     \
+		bash -c 'go vet $(SRC_AND_UNDER)'
 
 golint:
 	@echo -n "Checking golint: "
 	@docker run                                                            \
-                 	    -t                                                                \
-                 	    -u root:root                                             \
-                 	    -v $$(pwd)/.go:/go                                                 \
-                 	    -v $$(pwd):/go/src/$(PKG)                                          \
-                 	    -w /go/src/$(PKG)                                                  \
-                 	    $(BUILD_IMAGE)                                                     \
-                 	    bash -c 'export OUT=$$(golint $(SRC_AND_UNDER)) && if [ -n "$$OUT" ]; then echo "Golint problems discovered: $$OUT"; exit 1; fi'
+		-t                                                                \
+	    -u $(shell id -u):$(shell id -g)                                             \
+		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd):/go/src/$(PKG)                                          \
+		-w /go/src/$(PKG)                                                  \
+		$(BUILD_IMAGE)                                                     \
+		bash -c 'export OUT=$$(golint $(SRC_AND_UNDER)) && if [ -n "$$OUT" ]; then echo "Golint problems discovered: $$OUT"; exit 1; fi'
 
 
 version:
