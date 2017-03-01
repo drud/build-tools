@@ -5,7 +5,7 @@
 ##### comment about what you did and why.
 
 
-.PHONY: all build test push clean container-clean bin-clean version static vendorcheck gofmt govet golint
+.PHONY: all build test push clean container-clean bin-clean version static vendorcheck gofmt govet golint release
 
 SHELL := /bin/bash
 
@@ -93,6 +93,11 @@ golint:
                  	    $(BUILD_IMAGE)                                                     \
                  	    bash -c 'golint $(SRC_AND_UNDER)'
 
+release: build
+	@mkdir -p $(BUILD_BASE_DIR)/.artifacts
+	@tar -czf $(BUILD_BASE_DIR)/.artifacts/$(BIN_NAME)-macOS.tar.gz -C $(BUILD_BASE_DIR)/bin/darwin/darwin_amd64/ $(BIN_NAME)
+	@tar -czf $(BUILD_BASE_DIR)/.artifacts/$(BIN_NAME)-linux.tar.gz -C $(BUILD_BASE_DIR)/bin/linux/ $(BIN_NAME)
+
 
 version:
 	@echo VERSION:$(VERSION)
@@ -103,7 +108,7 @@ container-clean:
 	rm -rf .container-* .dockerfile* .push-* linux darwin container VERSION.txt .docker_image
 
 bin-clean:
-	rm -rf .go bin .tmp
+	rm -rf .go bin .tmp .artifacts
 
 # print-ANYVAR prints the expanded variable
 print-%: ; @echo $* = $($*)
