@@ -9,7 +9,7 @@ TESTOS = $(shell uname -s | tr '[:upper:]' '[:lower:]')
 test: build
 	@mkdir -p bin/linux
 	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
-	@docker run                                                            \
+	docker run                                                            \
 	    -t                                                                \
 	    -u $(shell id -u):$(shell id -g)                                             \
 	    -v $$(pwd)/.go:/go                                                 \

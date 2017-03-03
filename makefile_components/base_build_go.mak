@@ -28,7 +28,7 @@ linux darwin: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@rm -f VERSION.txt
 	@mkdir -p bin/$@ .go/std/$@ .go/bin .go/src/$(PKG)
-	@docker run                                                            \
+	docker run                                                            \
 	    -t                                                                \
 	    -u $(shell id -u):$(shell id -g)                                             \
 	    -v $$(pwd)/.go:/go                                                 \
@@ -51,7 +51,7 @@ static: govendor gofmt govet lint
 
 govendor:
 	@echo -n "Using govendor to check for missing dependencies and unused dependencies: "
-	@docker run                                                            \
+	docker run                                                            \
 		-t                                                                \
 	    -u $(shell id -u):$(shell id -g)                                             \
 		-v $$(pwd)/.go:/go                                                 \
@@ -62,7 +62,7 @@ govendor:
 
 gofmt:
 	@echo "Checking gofmt: "
-	@docker run                                                            \
+	docker run                                                            \
 		-t                                                                \
 	    -u $(shell id -u):$(shell id -g)                                             \
 		-v $$(pwd)/.go:/go                                                 \
@@ -73,7 +73,7 @@ gofmt:
 
 govet:
 	@echo -n "Checking go vet: "
-	@docker run                                                            \
+	docker run                                                            \
 		-t                                                                \
 		-u $(shell id -u):$(shell id -g)                                             \
 		-v $$(pwd)/.go:/go                                                 \
@@ -84,7 +84,7 @@ govet:
 
 golint:
 	@echo -n "Checking golint: "
-	@docker run                                                            \
+	docker run                                                            \
 		-t                                                                \
 	    -u $(shell id -u):$(shell id -g)                                             \
 		-v $$(pwd)/.go:/go                                                 \
