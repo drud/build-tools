@@ -17,8 +17,12 @@ export WORKING_DIR = $(shell pwd)
 SRC_DIRS := cmd pkg
 
 # Version variables to replace in build, The variable VERSION is automatically pulled from git committish so it doesn't have to be added
-# These are replaced in the $(PKG).version package.
-VERSION_VARIABLES = VERSION
+# These are replaced in the $(PKG).version package DBImg DBTag RouterImage RouterTag
+#VERSION_VARIABLES = DdevVersion WebImg
+
+# These variables will be used as the default unless overridden by the make command line
+#DdevVersion ?= $(VERSION)
+#WebImg ?= drud/nginx-php-fpm7-local
 
 # Optional to docker build
 # DOCKER_ARGS =
