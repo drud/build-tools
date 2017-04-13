@@ -85,6 +85,33 @@ golint:
 		$(BUILD_IMAGE)                                                     \
 		bash -c 'export OUT=$$(golint $(SRC_AND_UNDER)) && if [ -n "$$OUT" ]; then echo "Golint problems discovered: $$OUT"; exit 1; fi'
 
+errcheck:
+	@echo -n "Checking errcheck: "
+	docker run -t --rm -u $(shell id -u):$(shell id -g)                   \
+		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd):/go/src/$(PKG)                                          \
+		-w /go/src/$(PKG)                                                  \
+		$(BUILD_IMAGE)                                                     \
+		errcheck $(SRC_AND_UNDER)
+
+staticcheck:
+	@echo -n "Checking staticcheck: "
+	docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
+		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd):/go/src/$(PKG)                                          \
+		-w /go/src/$(PKG)                                                  \
+		$(BUILD_IMAGE)                                                     \
+		staticcheck $(SRC_AND_UNDER)
+
+unused:
+	@echo -n "Checking unused variables and functions: "
+	docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
+		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd):/go/src/$(PKG)                                          \
+		-w /go/src/$(PKG)                                                  \
+		$(BUILD_IMAGE)                                                     \
+		unused $(SRC_AND_UNDER)
+
 
 version:
 	@echo VERSION:$(VERSION)
