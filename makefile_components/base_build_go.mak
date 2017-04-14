@@ -112,6 +112,15 @@ unused:
 		$(BUILD_IMAGE)                                                     \
 		unused $(SRC_AND_UNDER)
 
+varcheck:
+	@echo -n "Checking unused globals and struct members: "
+	docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
+		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd):/go/src/$(PKG)                                          \
+		-w /go/src/$(PKG)                                                  \
+		$(BUILD_IMAGE)                                                     \
+		varcheck $(SRC_AND_UNDER) && structcheck $(SRC_AND_UNDER)
+
 
 version:
 	@echo VERSION:$(VERSION)
