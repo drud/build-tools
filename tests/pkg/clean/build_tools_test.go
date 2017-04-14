@@ -18,7 +18,10 @@ var (
 
 func init() {
 	// Default directory is the directory of the test file, but we need to run make from the directory of the Makefile
-	os.Chdir("../..")
+	err := os.Chdir("../..")
+	if err != nil {
+		log.Fatalln("Failed to chdir to ../..", err)
+	}
 	// Operating system - Darwin or Linux
 	v, err := exec.Command("uname", "-s").Output()
 	if err != nil {
@@ -42,6 +45,7 @@ func TestBuild(t *testing.T) {
 	fmt.Println("Current Directory:", dir)
 
 	v, err := exec.Command("which", "make").Output()
+	a.NoError(err)
 	a.Contains(string(v), "make")
 
 	// Try trivial "make version". This does use local system's make and git commands
@@ -67,11 +71,13 @@ func TestBuild(t *testing.T) {
 
 	// Run the native gofmtproblem application to make sure it runs
 	v, err = exec.Command(binlocs[osname] + "/build_tools_dummy").Output()
+	a.NoError(err)
 	a.Contains(string(v), "This is build_tools_dummy.go")
 	a.Contains(string(v), version.VERSION)
 
 	// Make container
 	v, err = exec.Command("make", "container").Output()
+	a.NoError(err)
 	a.Contains(string(v), "Successfully built")
 
 }
@@ -144,7 +150,7 @@ func TestGoLint(t *testing.T) {
 	assert.Contains(string(v), "exported function DummyExported_function should have comment")
 
 	// Test "make SRC_DIRS=pkg golint" to limit to just clean directories
-	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "golint").Output()
+	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "golint").Output()
 	assert.NoError(err) // Should have one complaint about gofmtproblem.go
 }
 
@@ -159,7 +165,49 @@ func TestGoVet(t *testing.T) {
 	assert.Contains(string(v), "pkg/dirtyComplex/bad_govet_code.go")
 
 	// Test "make SRC_DIRS=pkg govet" to limit to just clean directories
-	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "govet").Output()
+	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "govet").Output()
 	assert.NoError(err) // Should have no complaints in clean package
+}
 
+// Test errcheck.
+func TestErrCheck(t *testing.T) {
+	assert := assert.New(t)
+
+	// pkg/dirtycomplex/bad_errcheck_code.go
+	// Test "make errcheck"
+	v, err := exec.Command("make", "errcheck").Output()
+	assert.Error(err) // Should have one complaint about bad_errcheck_code.go
+	assert.Contains(string(v), "pkg/dirtyComplex/bad_errcheck_code.go")
+
+	// Test "make SRC_DIRS=pkg errcheck" to limit to just clean directories
+	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "errcheck").Output()
+	assert.NoError(err) // Should have no complaints in clean package
+}
+
+// Test staticcheck.
+func TestStaticcheck(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test "make staticcheck"
+	v, err := exec.Command("make", "staticcheck").Output()
+	assert.Error(err) // Should have one complaint about bad_staticcheck_code.go
+	assert.Contains(string(v), "pkg/dirtyComplex/bad_staticcheck_code.go")
+
+	// Test "make SRC_DIRS=pkg/clean staticcheck" to limit to just clean directories
+	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "staticcheck").Output()
+	assert.NoError(err) // Should have no complaints in clean package
+}
+
+// Test unused.
+func TestUnused(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test "make unused"
+	v, err := exec.Command("make", "unused").Output()
+	assert.Error(err) // Should have one complaint about bad_unused_code.go
+	assert.Contains(string(v), "pkg/dirtyComplex/bad_unused_code.go")
+
+	// Test "make SRC_DIRS=pkg/clean unused" to limit to just clean directories
+	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "unused").Output()
+	assert.NoError(err) // Should have no complaints in clean package
 }
