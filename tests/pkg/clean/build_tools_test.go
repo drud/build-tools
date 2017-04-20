@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"fmt"
-	"github.com/drud/build-tools/tests/pkg/version"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/drud/build-tools/tests/pkg/version"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -204,6 +205,20 @@ func TestUnused(t *testing.T) {
 
 	// Test "make unused"
 	v, err := exec.Command("make", "unused").Output()
+	assert.Error(err) // Should have one complaint about bad_unused_code.go
+	assert.Contains(string(v), "pkg/dirtyComplex/bad_unused_code.go")
+
+	// Test "make SRC_DIRS=pkg/clean unused" to limit to just clean directories
+	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "unused").Output()
+	assert.NoError(err) // Should have no complaints in clean package
+}
+
+// Test codecoroner.
+func TestCodeCoroner(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test "make unused"
+	v, err := exec.Command("make", "codecoroner").Output()
 	assert.Error(err) // Should have one complaint about bad_unused_code.go
 	assert.Contains(string(v), "pkg/dirtyComplex/bad_unused_code.go")
 
