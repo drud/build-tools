@@ -219,8 +219,9 @@ func TestCodeCoroner(t *testing.T) {
 
 	// Test "make unused"
 	v, err := exec.Command("make", "codecoroner").Output()
-	assert.Error(err) // Should have one complaint about bad_unused_code.go
-	assert.Contains(string(v), "pkg/dirtyComplex/bad_unused_code.go")
+	assert.Error(err)                                        // Should complain about pretty much everything in the dirtyComplex package.
+	assert.Contains(string(v), "AnotherExportedFunction")    // Check an exported function
+	assert.Contains(string(v), "yetAnotherExportedFunction") // Check an unexported function.
 
 	// Test "make SRC_DIRS=pkg/clean unused" to limit to just clean directories
 	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "unused").Output()
