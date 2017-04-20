@@ -217,13 +217,13 @@ func TestUnused(t *testing.T) {
 func TestCodeCoroner(t *testing.T) {
 	assert := assert.New(t)
 
-	// Test "make unused"
+	// Test "make codecoroner"
 	v, err := exec.Command("make", "codecoroner").Output()
 	assert.Error(err)                                        // Should complain about pretty much everything in the dirtyComplex package.
 	assert.Contains(string(v), "AnotherExportedFunction")    // Check an exported function
 	assert.Contains(string(v), "yetAnotherExportedFunction") // Check an unexported function.
 
-	// Test "make SRC_DIRS=pkg/clean unused" to limit to just clean directories
+	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
 	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "unused").Output()
 	assert.NoError(err) // Should have no complaints in clean package
 }
