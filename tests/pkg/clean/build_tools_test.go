@@ -5,11 +5,12 @@ import (
 	"testing"
 
 	"fmt"
-	"github.com/drud/build-tools/tests/pkg/version"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/drud/build-tools/tests/pkg/version"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -208,6 +209,21 @@ func TestUnused(t *testing.T) {
 	assert.Contains(string(v), "pkg/dirtyComplex/bad_unused_code.go")
 
 	// Test "make SRC_DIRS=pkg/clean unused" to limit to just clean directories
+	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "unused").Output()
+	assert.NoError(err) // Should have no complaints in clean package
+}
+
+// Test codecoroner.
+func TestCodeCoroner(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test "make codecoroner"
+	v, err := exec.Command("make", "codecoroner").Output()
+	assert.Error(err)                                        // Should complain about pretty much everything in the dirtyComplex package.
+	assert.Contains(string(v), "AnotherExportedFunction")    // Check an exported function
+	assert.Contains(string(v), "yetAnotherExportedFunction") // Check an unexported function.
+
+	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
 	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "unused").Output()
 	assert.NoError(err) // Should have no complaints in clean package
 }
