@@ -11,7 +11,7 @@ SHELL := /bin/bash
 
 GOFILES = $(shell find $(SRC_DIRS) -name "*.go")
 
-BUILD_IMAGE ?= drud/golang-build-container:codecoroner
+BUILD_IMAGE ?= drud/golang-build-container:v0.3.0
 
 BUILD_BASE_DIR ?= $$PWD
 
