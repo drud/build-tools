@@ -28,7 +28,7 @@ cd build-tools
 
 ## Additional chores when installing:
 
-* Add the items from gitignore_example to your .gitignore
+* Add the items from gitignore_example to the .gitignore in each directory that has a Makefile
 * Update the project README.md to explain how to build - the target reminders in the paragraph below may be helpful.
 
 ## Basic targets and capabilities
