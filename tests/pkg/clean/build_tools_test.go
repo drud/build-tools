@@ -75,6 +75,10 @@ func TestBuild(t *testing.T) {
 	a.NoError(err)
 	a.Contains(string(v), "This is build_tools_dummy.go")
 	a.Contains(string(v), version.VERSION)
+	a.Contains(string(v), version.COMMIT)
+	a.Contains(string(v), "Built ")
+	a.NotContains(string(v), "COMMIT should be overridden")
+	a.NotContains(string(v), "BUILDINFO should have new info")
 
 	// Make container
 	v, err = exec.Command("make", "container").Output()
