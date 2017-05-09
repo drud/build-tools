@@ -38,8 +38,9 @@ func TestBuild(t *testing.T) {
 
 	// Map OS name to output location
 	binlocs := map[string]string{
-		"Darwin": "bin/darwin/darwin_amd64",
-		"Linux":  "bin/linux",
+		"Darwin":  "bin/darwin/darwin_amd64/build_tools_dummy",
+		"Linux":   "bin/linux/build_tools_dummy",
+		"Windows": "bin/windows/windows_amd64/build_tools_dummy.exe",
 	}
 
 	dir, _ := os.Getwd()
@@ -70,8 +71,12 @@ func TestBuild(t *testing.T) {
 	a.NoError(err)
 	a.Contains(string(v), "building linux")
 
+	v, err = exec.Command("make", "windows").Output()
+	a.NoError(err)
+	a.Contains(string(v), "building windows")
+
 	// Run the native gofmtproblem application to make sure it runs
-	v, err = exec.Command(binlocs[osname] + "/build_tools_dummy").Output()
+	v, err = exec.Command(binlocs[osname]).Output()
 	a.NoError(err)
 	a.Contains(string(v), "This is build_tools_dummy.go")
 	a.Contains(string(v), version.VERSION)

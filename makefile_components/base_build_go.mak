@@ -32,7 +32,7 @@ LDFLAGS := -extldflags -static $(VERSION_LDFLAGS)
 
 build: linux darwin
 
-linux darwin: $(GOFILES)
+linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@rm -f VERSION.txt
 	@mkdir -p bin/$@ .go/std/$@ .go/bin .go/src/$(PKG)
@@ -158,7 +158,7 @@ version:
 clean: container-clean bin-clean
 
 container-clean:
-	rm -rf .container-* .dockerfile* .push-* linux darwin container VERSION.txt .docker_image
+	rm -rf .container-* .dockerfile* .push-* linux darwin windows container VERSION.txt .docker_image
 
 bin-clean:
 	rm -rf .go bin .tmp
