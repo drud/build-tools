@@ -237,13 +237,14 @@ func TestMisspell(t *testing.T) {
 	assert := assert.New(t)
 
 	// Test "make codecoroner"
-	v, err := exec.Command("make", "misspell").Output()
-	assert.Error(err)                                        // Should complain about pretty much everything in the dirtyComplex package.
-	assert.Contains(string(v), "\"mispelled\" is a misspelling of \"misspelled\"")    // Check an exported function
+	v, err := exec.Command("make", "--no-print-directory", "misspell").Output()
+	assert.NoError(err)                                               // This one doesn't make an error return
+	assert.Contains(string(v), " is a misspelling of \"misspelled\"") // Check an exported function
 
 	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
-	_, err = exec.Command("make", "misspell", "SRC_DIRS=pkg/clean").Output()
+	v, err = exec.Command("make", "--no-print-directory", "misspell", "SRC_DIRS=pkg/clean").Output()
 	assert.NoError(err) // Should have no complaints in clean package
+	assert.Equal(string(v), "Checking for misspellings: \n")
 }
 
 // Test gometalinter.
