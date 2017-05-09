@@ -232,6 +232,20 @@ func TestCodeCoroner(t *testing.T) {
 	assert.NoError(err) // Should have no complaints in clean package
 }
 
+// Test misspell.
+func TestMisspell(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test "make codecoroner"
+	v, err := exec.Command("make", "misspell").Output()
+	assert.Error(err)                                        // Should complain about pretty much everything in the dirtyComplex package.
+	assert.Contains(string(v), "\"mispelled\" is a misspelling of \"misspelled\"")    // Check an exported function
+
+	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
+	_, err = exec.Command("make", "misspell", "SRC_DIRS=pkg/clean").Output()
+	assert.NoError(err) // Should have no complaints in clean package
+}
+
 // Test gometalinter.
 func TestGoMetalinter(t *testing.T) {
 	assert := assert.New(t)

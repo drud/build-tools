@@ -134,6 +134,15 @@ varcheck:
 		$(BUILD_IMAGE)                                                     \
 		varcheck $(SRC_AND_UNDER) && structcheck $(SRC_AND_UNDER)
 
+misspell:
+	@echo "Checking for misspellings: "
+	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
+		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd):/go/src/$(PKG)                                          \
+		-w /go/src/$(PKG)                                                  \
+		$(BUILD_IMAGE)                                                     \
+		misspell $(SRC_DIRS)
+
 gometalinter:
 	@echo "gometalinter: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
