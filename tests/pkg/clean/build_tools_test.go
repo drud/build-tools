@@ -155,7 +155,7 @@ func TestGoLint(t *testing.T) {
 	assert.Contains(string(v), "exported function DummyExported_function should have comment")
 
 	// Test "make SRC_DIRS=pkg golint" to limit to just clean directories
-	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "golint").Output()
+	_, err = exec.Command("make", "golint", "SRC_DIRS=pkg/clean").Output()
 	assert.NoError(err) // Should have one complaint about gofmtproblem.go
 }
 
@@ -170,7 +170,7 @@ func TestGoVet(t *testing.T) {
 	assert.Contains(string(v), "pkg/dirtyComplex/bad_govet_code.go")
 
 	// Test "make SRC_DIRS=pkg govet" to limit to just clean directories
-	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "govet").Output()
+	_, err = exec.Command("make", "govet", "SRC_DIRS=pkg/clean").Output()
 	assert.NoError(err) // Should have no complaints in clean package
 }
 
@@ -185,7 +185,7 @@ func TestErrCheck(t *testing.T) {
 	assert.Contains(string(v), "pkg/dirtyComplex/bad_errcheck_code.go")
 
 	// Test "make SRC_DIRS=pkg errcheck" to limit to just clean directories
-	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "errcheck").Output()
+	_, err = exec.Command("make", "errcheck", "SRC_DIRS=pkg/clean").Output()
 	assert.NoError(err) // Should have no complaints in clean package
 }
 
@@ -199,7 +199,7 @@ func TestStaticcheck(t *testing.T) {
 	assert.Contains(string(v), "pkg/dirtyComplex/bad_staticcheck_code.go")
 
 	// Test "make SRC_DIRS=pkg/clean staticcheck" to limit to just clean directories
-	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "staticcheck").Output()
+	_, err = exec.Command("make", "staticcheck", "SRC_DIRS=pkg/clean").Output()
 	assert.NoError(err) // Should have no complaints in clean package
 }
 
@@ -213,7 +213,7 @@ func TestUnused(t *testing.T) {
 	assert.Contains(string(v), "pkg/dirtyComplex/bad_unused_code.go")
 
 	// Test "make SRC_DIRS=pkg/clean unused" to limit to just clean directories
-	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "unused").Output()
+	_, err = exec.Command("make", "unused", "SRC_DIRS=pkg/clean").Output()
 	assert.NoError(err) // Should have no complaints in clean package
 }
 
@@ -228,6 +228,35 @@ func TestCodeCoroner(t *testing.T) {
 	assert.Contains(string(v), "yetAnotherExportedFunction") // Check an unexported function.
 
 	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
-	_, err = exec.Command("make", "SRC_DIRS=pkg/clean", "unused").Output()
+	_, err = exec.Command("make", "codecoroner", "SRC_DIRS=pkg/clean").Output()
+	assert.NoError(err) // Should have no complaints in clean package
+}
+
+// Test misspell.
+func TestMisspell(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test "make codecoroner"
+	v, err := exec.Command("make", "--no-print-directory", "misspell").Output()
+	assert.NoError(err)                                               // This one doesn't make an error return
+	assert.Contains(string(v), " is a misspelling of \"misspelled\"") // Check an exported function
+
+	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
+	v, err = exec.Command("make", "--no-print-directory", "misspell", "SRC_DIRS=pkg/clean").Output()
+	assert.NoError(err) // Should have no complaints in clean package
+	assert.Equal(string(v), "Checking for misspellings: \n")
+}
+
+// Test gometalinter.
+func TestGoMetalinter(t *testing.T) {
+	assert := assert.New(t)
+
+	// Test "make gometalinter"
+	v, err := exec.Command("make", "gometalinter").Output()
+	assert.Error(err)                                                  // Should complain about pretty much everything in the dirtyComplex package.
+	assert.Contains(string(v), "yetAnotherExportedFunction is unused") // Check an unexported function.
+
+	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
+	_, err = exec.Command("make", "gometalinter", "SRC_DIRS=pkg/clean").Output()
 	assert.NoError(err) // Should have no complaints in clean package
 }
