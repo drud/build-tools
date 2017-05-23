@@ -57,6 +57,7 @@ test: build
 	@mkdir -p bin/linux
 	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
 	go test -v -installsuffix "static" -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
+	$(MAKE) -C standard_target $@
 
 # Simple way to execute a random command in the container for tests - used only for testing
 # Example: make COMMAND="govendor fetch golang.org/x/net/context"

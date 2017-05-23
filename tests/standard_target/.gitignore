@@ -1,3 +1,5 @@
+# Add these lines to the .gitignore in each directory with a Makefile
+
 # Temporary build-tools artifacts to be ignored
 /.go/
 /bin/
