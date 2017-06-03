@@ -55,7 +55,7 @@ include ../makefile_components/base_push.mak
 # golang compiler container.
 test: build
 	@mkdir -p bin/linux
-	@mkdir -p .go/src/$(PKG) .go/pkg .go/bin .go/std/linux
+	@mkdir -p  $(GOTMP)/{src/$(PKG),pkg,bin,std/linux}
 	go test -v -installsuffix "static" -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
 	$(MAKE) -C standard_target $@
 
@@ -66,7 +66,7 @@ container_cmd:
 	@docker run                                                            \
 		-t                                                                \
 	    -u $(shell id -u):$(shell id -g)                                             \
-		-v $$(pwd)/.go:/go                                                 \
+		-v $$(pwd)/$(GOTMP):/go                                                 \
 		-v $$(pwd):/go/src/$(PKG)                                          \
 		-w /go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
