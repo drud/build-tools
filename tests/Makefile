@@ -56,8 +56,13 @@ include ../makefile_components/base_push.mak
 test: build
 	@mkdir -p bin/linux
 	@mkdir -p  $(GOTMP)/{src/$(PKG),pkg,bin,std/linux}
-	go test -v -installsuffix "static" -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
+	@go test -v -installsuffix "static" -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
 	$(MAKE) -C standard_target $@
+
+# test_precompile allows a full compilation of _test.go files, without execution of the tests.
+# Setup and teardown in TestMain is still executed though, so this can cost some time.
+test_precompile: TESTARGS=-run '^$$'
+test_precompile: test
 
 # Simple way to execute a random command in the container for tests - used only for testing
 # Example: make COMMAND="govendor fetch golang.org/x/net/context"
