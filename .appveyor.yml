@@ -17,6 +17,14 @@ init:
 # Build
 
 install:
+  - ps: Stop-Service docker
+  - ps: Remove-Item -Force -Recurse $env:ProgramFiles\docker
+  - ps: Invoke-WebRequest -Uri "https://download.docker.com/win/static/test/x86_64/docker-17.06.0-ce.zip" -OutFile "docker.zip"
+  - ps: Expand-Archive -Path "docker.zip" -DestinationPath $env:ProgramFiles -Force 
+  - ps: Remove-Item docker.zip
+  - ps: Start-Service docker
+  - ps: Invoke-WebRequest "https://github.com/docker/compose/releases/download/1.14.0/docker-compose-Windows-x86_64.exe" -UseBasicParsing -OutFile $Env:ProgramFiles\docker\docker-compose.exe
+
   - docker version
   - docker-compose version
   # Install the specific Go version.
