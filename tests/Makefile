@@ -69,11 +69,12 @@ test_precompile: test
 COMMAND := govendor list
 container_cmd:
 	@docker run                                                            \
-		-t                                                                \
-	    -u $(shell id -u):$(shell id -g)                                             \
-		-v $$(pwd)/$(GOTMP):/go                                                 \
-		-v $$(pwd):/go/src/$(PKG)                                          \
+		-t --rm -u $(shell id -u):$(shell id -g)                         \
+	    -v $(PWD)/$(GOTMP):/go                                                 \
+	    -v $(PWD):/go/src/$(PKG)                                          \
+	    -v $(PWD)/bin/linux:/go/bin                                     \
+	    -v $(PWD)/$(GOTMP)/std/linux:/usr/local/go/pkg/linux_amd64_static  \
 		-w /go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
-		bash -c "$(COMMAND)"
+		$(COMMAND)
 

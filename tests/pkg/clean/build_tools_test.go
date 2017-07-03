@@ -4,10 +4,10 @@ import (
 	"os/exec"
 	"testing"
 
-	"fmt"
 	"log"
 	"os"
-	"strings"
+
+	"runtime"
 
 	"github.com/drud/build-tools/tests/pkg/version"
 	"github.com/stretchr/testify/assert"
@@ -23,12 +23,8 @@ func init() {
 	if err != nil {
 		log.Fatalln("Failed to chdir to ../..", err)
 	}
-	// Operating system - Darwin or Linux
-	v, err := exec.Command("uname", "-s").Output()
-	if err != nil {
-		log.Fatalln("Failed to run uname command:", string(v))
-	}
-	osname = strings.TrimSpace(string(v))
+	// Operating system - Darwin or Linux or Windows
+	osname = runtime.GOOS
 }
 
 // Runs a number of standard make targets and test for basic sanity of result
@@ -38,13 +34,12 @@ func TestBuild(t *testing.T) {
 
 	// Map OS name to output location
 	binlocs := map[string]string{
-		"Darwin":  "bin/darwin/darwin_amd64/build_tools_dummy",
-		"Linux":   "bin/linux/build_tools_dummy",
-		"Windows": "bin/windows/windows_amd64/build_tools_dummy.exe",
+		"darwin":  "bin/darwin/darwin_amd64/build_tools_dummy",
+		"linux":   "bin/linux/build_tools_dummy",
+		"windows": "bin/windows/windows_amd64/build_tools_dummy.exe",
 	}
 
 	dir, _ := os.Getwd()
-	fmt.Println("Current Directory:", dir)
 
 	v, err := exec.Command("which", "make").Output()
 	a.NoError(err)
