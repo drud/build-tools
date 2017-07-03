@@ -143,6 +143,10 @@ func TestGovendor(t *testing.T) {
 	_, err = exec.Command("make", "COMMAND=govendor fetch "+neededPackage, "container_cmd").Output()
 	assert.NoError(err)
 
+	// Try to clean up the mess we may have made in the vendor directory
+	_, _ = exec.Command("git", "checkout vendor").Output()
+	_, _ = exec.Command("git", "clean -fd vendor").Output()
+
 }
 
 // Test golint on clean and unclean code

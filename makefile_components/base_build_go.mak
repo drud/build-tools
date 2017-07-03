@@ -44,8 +44,7 @@ linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@$(shell rm -f VERSION.txt)
 	@$(shell mkdir -p bin/$@ $(GOTMP)/{std/$@,bin,src/$(PKG)})
-
-	docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
+	@docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
 	    -v $(PWD)/$(GOTMP):/go                                                 \
 	    -v $(PWD):/go/src/$(PKG)                                          \
 	    -v $(PWD)/bin/$@:/go/bin                                     \
