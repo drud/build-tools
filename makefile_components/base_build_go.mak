@@ -35,7 +35,8 @@ LDFLAGS := -extldflags -static $(VERSION_LDFLAGS)
 
 PWD=$(shell pwd)
 ifeq ($(BUILD_OS),windows)
-    PWD=$(shell cmd /C echo %cd%)
+    TMPPWD=$(shell cmd /C echo %cd%)
+    PWD=$(shell echo "$(TMPPWD)" | awk '{gsub("\\\\", "/"); print}' )
 endif
 
 build: linux darwin
