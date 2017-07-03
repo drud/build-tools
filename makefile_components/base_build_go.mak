@@ -12,6 +12,8 @@ SHELL = /bin/bash
 
 GOFILES = $(shell find $(SRC_DIRS) -name "*.go")
 
+BUILD_OS = $(shell go env GOHOSTOS)
+
 BUILD_IMAGE ?= drud/golang-build-container:v0.4.2
 
 BUILD_BASE_DIR ?= $$PWD
@@ -31,7 +33,10 @@ VERSION_LDFLAGS := $(foreach v,$(VERSION_VARIABLES),-X "$(PKG)/pkg/version.$(v)=
 
 LDFLAGS := -extldflags -static $(VERSION_LDFLAGS)
 
-PWD := $(shell pwd)
+PWD=$(shell pwd)
+ifeq ($(BUILD_OS),windows)
+    PWD=$(shell cmd /C echo %cd%)
+endif
 
 build: linux darwin
 

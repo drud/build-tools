@@ -4,7 +4,7 @@
 ##### contents into ../Makefile and commenting out the include and adding a
 ##### comment about what you did and why.
 
-TESTOS = $(shell uname -s | tr '[:upper:]' '[:lower:]')
+TESTOS = $(BUILD_OS)
 
 test: build
 	@mkdir -p bin/linux
