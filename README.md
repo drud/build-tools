@@ -54,11 +54,20 @@ make clean
 
 On Windows, using the tools described below, use the command:
 
+```
 "C:\Program Files\git\bin\bash" -c "make"
 "C:\Program Files\git\bin\bash" -c "make test"
 "C:\Program Files\git\bin\bash" -c "make test TESTARGS='-run TestSomething'"
 "C:\Program Files\git\bin\bash" -c "make gofmt"
+```
 
+If you're using Powershell instead of cmd, just prepend an `&` on the command, as in:
+
+```
+&"C:\Program Files\git\bin\bash" -c "make"
+```
+
+(Note that if you're working with the code, you can just run git bash and do make (and anything else you want) from inside it.)
 
 ## Installed requirements
 
