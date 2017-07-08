@@ -1,3 +1,6 @@
+# At this time the appveyor.yml doesn't help us much because we use
+# Linux docker containers extensively, and appveyor is unable to use them.
+# So even building (not to mention testing) isn't possible.
 version: "{build}"
 image: Visual Studio 2017
 
