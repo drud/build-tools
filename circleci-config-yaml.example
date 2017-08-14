@@ -18,3 +18,18 @@ stages:
 
       - run: make -s gofmt golint
 
+      - deploy:
+          name: push docker image on new tag push
+          command: |
+            CURRENT_TAG=$(git describe --tags --abbrev=0)
+            COMMIT_TAG=$(git describe --tags)
+            if [ "${CURRENT_TAG}" == "${COMMIT_TAG}" ]; then
+              docker login -u $DOCKER_USER -p $DOCKER_PASS
+              make push
+            fi
+
+# workaround for triggering a build when new tag is pushed
+# https://discuss.circleci.com/t/git-tag-deploys-in-2-0/9493/8
+deployment:
+  push_on_tag:
+    tag: /.*/
