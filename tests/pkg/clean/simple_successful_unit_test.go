@@ -6,7 +6,7 @@ import (
 )
 
 func TestSuccessfulMath(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
-	assert.EqualValues(2+2, 4)
+	a.EqualValues(2+2, 4)
 }
