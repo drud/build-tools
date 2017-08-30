@@ -89,16 +89,16 @@ func TestBuild(t *testing.T) {
 
 // Try gofmt - it should fail with specific gofmtproblem.go complaint
 func TestGoFmt(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	// Test "make gofmt
 	v, err := exec.Command("make", "gofmt").Output()
-	assert.Error(err) // We should have an error with bad_gofmt_code.go
-	assert.Contains(string(v), "pkg/dirtyComplex/bad_gofmt_code.go")
+	a.Error(err) // We should have an error with bad_gofmt_code.go
+	a.Contains(string(v), "pkg/dirtyComplex/bad_gofmt_code.go")
 
 	// Test "make SRC_DIRS=pkg/clean gofmt" - has no errors
 	v, err = exec.Command("make", "SRC_DIRS=pkg/clean", "gofmt").Output()
-	assert.NoError(err, "make SRC_DIRS=pkg/clean gofmt failed: output="+string(v)) // No error on the clean directory
+	a.NoError(err, "make SRC_DIRS=pkg/clean gofmt failed: output="+string(v)) // No error on the clean directory
 
 }
 
@@ -108,40 +108,40 @@ func TestGoFmt(t *testing.T) {
 // The COMMAND=some command argument to exec.Command() is an oddity - due to the way this argument is processed,
 // it must not be escaped.
 func TestGovendor(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	simpleExtraPackage := "golang.org/x/net/context"
 	neededPackage := "github.com/stretchr/testify/assert"
 
 	// Test "make govendor"
 	_, err := exec.Command("make", "govendor").Output()
-	assert.NoError(err) // Base code should have no errors
+	a.NoError(err) // Base code should have no errors
 
 	// Add an unused vendor item (net/context) and check that our govendor now fails
 	v, err := exec.Command("make", "COMMAND=govendor fetch "+simpleExtraPackage, "container_cmd").Output()
-	assert.NoError(err, "Failed 'govendor fetch %v', result=%v", simpleExtraPackage, string(v))
+	a.NoError(err, "Failed 'govendor fetch %v', result=%v", simpleExtraPackage, string(v))
 
 	v, err = exec.Command("make", "govendor").Output()
-	assert.Error(err) // We should have an error now, with unused item
-	assert.Contains(string(v), "u "+simpleExtraPackage)
+	a.Error(err) // We should have an error now, with unused item
+	a.Contains(string(v), "u "+simpleExtraPackage)
 
 	// Remove the extra item
 	_, err = exec.Command("make", "COMMAND=govendor remove "+simpleExtraPackage, "container_cmd").Output()
-	assert.NoError(err)
+	a.NoError(err)
 	// Test "make govendor" - should be back to no errors
 	_, err = exec.Command("make", "govendor").Output()
-	assert.NoError(err) // Base code should have no errors
+	a.NoError(err) // Base code should have no errors
 
 	// Remove a necessary package
 	_, err = exec.Command("make", "COMMAND=govendor remove "+neededPackage, "container_cmd").Output()
-	assert.NoError(err)
+	a.NoError(err)
 	// Test "make govendor" - should show assert as a missing item
 	v, err = exec.Command("make", "govendor").Output()
-	assert.Error(err)
-	assert.Contains(string(v), "m "+neededPackage)
+	a.Error(err)
+	a.Contains(string(v), "m "+neededPackage)
 
 	_, err = exec.Command("make", "COMMAND=govendor fetch "+neededPackage, "container_cmd").Output()
-	assert.NoError(err)
+	a.NoError(err)
 
 	// Try to clean up the mess we may have made in the vendor directory
 	_, _ = exec.Command("git", "checkout vendor").Output()
@@ -151,116 +151,116 @@ func TestGovendor(t *testing.T) {
 
 // Test golint on clean and unclean code
 func TestGoLint(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	// Test "make golint"
 	v, err := exec.Command("make", "golint").Output()
-	assert.Error(err) // Should have one complaint about gofmtproblem.go
-	assert.Contains(string(v), "exported function DummyExported_function should have comment")
+	a.Error(err) // Should have one complaint about gofmtproblem.go
+	a.Contains(string(v), "exported function DummyExported_function should have comment")
 
 	// Test "make SRC_DIRS=pkg golint" to limit to just clean directories
 	_, err = exec.Command("make", "golint", "SRC_DIRS=pkg/clean").Output()
-	assert.NoError(err) // Should have one complaint about gofmtproblem.go
+	a.NoError(err) // Should have one complaint about gofmtproblem.go
 }
 
 // Test govet for simple problems
 func TestGoVet(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	// cmd/gofmtproblem/gofmtproblem.go
 	// Test "make govet"
 	v, err := exec.Command("make", "govet").Output()
-	assert.Error(err) // Should have one complaint about gofmtproblem.go
-	assert.Contains(string(v), "pkg/dirtyComplex/bad_govet_code.go")
+	a.Error(err) // Should have one complaint about gofmtproblem.go
+	a.Contains(string(v), "pkg/dirtyComplex/bad_govet_code.go")
 
 	// Test "make SRC_DIRS=pkg govet" to limit to just clean directories
 	_, err = exec.Command("make", "govet", "SRC_DIRS=pkg/clean").Output()
-	assert.NoError(err) // Should have no complaints in clean package
+	a.NoError(err) // Should have no complaints in clean package
 }
 
 // Test errcheck.
 func TestErrCheck(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	// pkg/dirtycomplex/bad_errcheck_code.go
 	// Test "make errcheck"
 	v, err := exec.Command("make", "errcheck").Output()
-	assert.Error(err) // Should have one complaint about bad_errcheck_code.go
-	assert.Contains(string(v), "pkg/dirtyComplex/bad_errcheck_code.go")
+	a.Error(err) // Should have one complaint about bad_errcheck_code.go
+	a.Contains(string(v), "pkg/dirtyComplex/bad_errcheck_code.go")
 
 	// Test "make SRC_DIRS=pkg errcheck" to limit to just clean directories
 	_, err = exec.Command("make", "errcheck", "SRC_DIRS=pkg/clean").Output()
-	assert.NoError(err) // Should have no complaints in clean package
+	a.NoError(err) // Should have no complaints in clean package
 }
 
 // Test staticcheck.
 func TestStaticcheck(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	// Test "make staticcheck"
 	v, err := exec.Command("make", "staticcheck").Output()
-	assert.Error(err) // Should have one complaint about bad_staticcheck_code.go
-	assert.Contains(string(v), "pkg/dirtyComplex/bad_staticcheck_code.go")
+	a.Error(err) // Should have one complaint about bad_staticcheck_code.go
+	a.Contains(string(v), "pkg/dirtyComplex/bad_staticcheck_code.go")
 
 	// Test "make SRC_DIRS=pkg/clean staticcheck" to limit to just clean directories
 	_, err = exec.Command("make", "staticcheck", "SRC_DIRS=pkg/clean").Output()
-	assert.NoError(err) // Should have no complaints in clean package
+	a.NoError(err) // Should have no complaints in clean package
 }
 
 // Test unused.
 func TestUnused(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	// Test "make unused"
 	v, err := exec.Command("make", "unused").Output()
-	assert.Error(err) // Should have one complaint about bad_unused_code.go
-	assert.Contains(string(v), "pkg/dirtyComplex/bad_unused_code.go")
+	a.Error(err) // Should have one complaint about bad_unused_code.go
+	a.Contains(string(v), "pkg/dirtyComplex/bad_unused_code.go")
 
 	// Test "make SRC_DIRS=pkg/clean unused" to limit to just clean directories
 	_, err = exec.Command("make", "unused", "SRC_DIRS=pkg/clean").Output()
-	assert.NoError(err) // Should have no complaints in clean package
+	a.NoError(err) // Should have no complaints in clean package
 }
 
 // Test codecoroner.
 func TestCodeCoroner(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	// Test "make codecoroner"
 	v, err := exec.Command("make", "codecoroner").Output()
-	assert.Error(err)                                        // Should complain about pretty much everything in the dirtyComplex package.
-	assert.Contains(string(v), "AnotherExportedFunction")    // Check an exported function
-	assert.Contains(string(v), "yetAnotherExportedFunction") // Check an unexported function.
+	a.Error(err)                                        // Should complain about pretty much everything in the dirtyComplex package.
+	a.Contains(string(v), "AnotherExportedFunction")    // Check an exported function
+	a.Contains(string(v), "yetAnotherExportedFunction") // Check an unexported function.
 
 	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
 	_, err = exec.Command("make", "codecoroner", "SRC_DIRS=pkg/clean").Output()
-	assert.NoError(err) // Should have no complaints in clean package
+	a.NoError(err) // Should have no complaints in clean package
 }
 
 // Test misspell.
 func TestMisspell(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	// Test "make codecoroner"
 	v, err := exec.Command("make", "--no-print-directory", "misspell").Output()
-	assert.NoError(err)                                               // This one doesn't make an error return
-	assert.Contains(string(v), " is a misspelling of \"misspelled\"") // Check an exported function
+	a.NoError(err)                                               // This one doesn't make an error return
+	a.Contains(string(v), " is a misspelling of \"misspelled\"") // Check an exported function
 
 	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
 	v, err = exec.Command("make", "--no-print-directory", "misspell", "SRC_DIRS=pkg/clean").Output()
-	assert.NoError(err) // Should have no complaints in clean package
-	assert.Equal(string(v), "Checking for misspellings: \n")
+	a.NoError(err) // Should have no complaints in clean package
+	a.Equal(string(v), "Checking for misspellings: \n")
 }
 
 // Test gometalinter.
 func TestGoMetalinter(t *testing.T) {
-	assert := assert.New(t)
+	a := assert.New(t)
 
 	// Test "make gometalinter"
 	v, err := exec.Command("make", "gometalinter").Output()
-	assert.Error(err)                                                  // Should complain about pretty much everything in the dirtyComplex package.
-	assert.Contains(string(v), "yetAnotherExportedFunction is unused") // Check an unexported function.
+	a.Error(err)                                                  // Should complain about pretty much everything in the dirtyComplex package.
+	a.Contains(string(v), "yetAnotherExportedFunction is unused") // Check an unexported function.
 
 	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
 	_, err = exec.Command("make", "gometalinter", "SRC_DIRS=pkg/clean").Output()
-	assert.NoError(err) // Should have no complaints in clean package
+	a.NoError(err) // Should have no complaints in clean package
 }
