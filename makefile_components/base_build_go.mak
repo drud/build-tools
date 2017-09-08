@@ -59,7 +59,7 @@ linux darwin windows: $(GOFILES)
 	@$(shell touch $@)
 	@echo $(VERSION) >VERSION.txt
 
-static: govendor gofmt govet lint
+static: gofmt govet golint errcheck staticcheck codecoroner
 
 govendor:
 	@echo -n "Using govendor to check for missing dependencies and unused dependencies: "
