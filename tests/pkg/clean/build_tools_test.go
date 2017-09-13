@@ -257,8 +257,10 @@ func TestGoMetalinter(t *testing.T) {
 
 	// Test "make gometalinter"
 	v, err := exec.Command("make", "gometalinter").Output()
-	a.Error(err)                                                  // Should complain about pretty much everything in the dirtyComplex package.
-	a.Contains(string(v), "yetAnotherExportedFunction is unused") // Check an unexported function.
+	a.Error(err) // Should complain about pretty much everything in the dirtyComplex package.
+	a.Contains(string(v), "exported function DummyExported_function should have comment or be unexported (golint)")
+	a.Contains(string(v), "file is not gofmted with -s (gofmt)")
+	a.Contains(string(v), "this value of err is never used (SA4006) (staticcheck)")
 
 	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
 	_, err = exec.Command("make", "gometalinter", "SRC_DIRS=pkg/clean").Output()
