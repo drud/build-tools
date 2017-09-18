@@ -21,7 +21,7 @@ BUILD_BASE_DIR ?= $$PWD
 # Expands SRC_DIRS into the common golang ./dir/... format for "all below"
 SRC_AND_UNDER = $(patsubst %,./%/...,$(SRC_DIRS))
 
-GOMETALINTER_ARGS ?= --vendored-linters --disable-all --enable=gofmt --enable=vet --enable=golint --enable=errcheck --enable=staticcheck --enable=ineffassign --enable=varcheck --enable=deadcode --deadline=2m
+GOMETALINTER_ARGS ?= --vendored-linters --disable-all --enable=gofmt --enable=vet --enable=vetshadow --enable=golint --enable=errcheck --enable=staticcheck --enable=ineffassign --enable=varcheck --enable=deadcode --deadline=2m
 
 
 COMMIT := $(shell git describe --tags --always --dirty)
