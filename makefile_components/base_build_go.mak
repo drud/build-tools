@@ -32,7 +32,7 @@ VERSION_VARIABLES += VERSION COMMIT BUILDINFO
 VERSION_LDFLAGS := $(foreach v,$(VERSION_VARIABLES),-X "$(PKG)/pkg/version.$(v)=$($(v))")
 
 LDFLAGS := -extldflags -static $(VERSION_LDFLAGS)
-DOCKERMOUNTFLAG := $(DOCKERMOUNTFLAG)
+DOCKERMOUNTFLAG := :delegated
 
 PWD=$(shell pwd)
 ifeq ($(BUILD_OS),windows)
