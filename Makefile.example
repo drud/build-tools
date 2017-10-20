@@ -26,9 +26,8 @@ SRC_DIRS := pkg cmd
 # DOCKER_ARGS =
 
 # VERSION can be set by
-  # Default: git tag
-  # make command line: make VERSION=0.9.0
-# It can also be explicitly set in the Makefile as commented out below.
+	# Default: git tag
+	# make command line: make VERSION=0.9.0
 
 # Normally VERSION is derived from git committish/tag.
 # VERSION can be overridden on make commandline: make push VERSION=0.9.1
