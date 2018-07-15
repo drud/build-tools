@@ -11,22 +11,13 @@ cd $DRUDSRC/build-tools
 BUILD_OS=$(go env GOOS)
 echo "--- buildkite building $BUILDKITE_JOB_ID at $(date) on $HOSTNAME for OS=$(go env GOOS) in $PWD GOPATH=$GOPATH"
 
-echo "--- cleaning up docker"
-echo "Warning: deleting all docker containers"
-if [ "$(docker ps -aq | wc -l)" -gt 0 ] ; then
-	docker rm -f $(docker ps -aq)
-fi
-docker system prune --force
-
-# Update all images that could have changed
-docker images | awk '/drud/ {print $1":"$2 }' | xargs -L1 docker pull
-
 set -o errexit
 set -o pipefail
 set -o nounset
 set -x
 
 # Our testbot should now be sane, run the testbot checker to make sure.
+echo "--- Checking for sane testbot"
 ./.buildkite/sanetestbot.sh
 
 echo "--- make $BUILD_OS"
