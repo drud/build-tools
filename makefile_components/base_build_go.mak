@@ -169,7 +169,8 @@ clean: container-clean bin-clean
 	@go clean -cache || echo "You're not running latest golang locally" # Make sure the local go cache is clean for testing
 
 container-clean:
-	$(shell rm -rf .container-* .dockerfile* .push-* linux darwin windows container VERSION.txt .docker_image)
+	@if docker image inspect $(DOCKER_REPO):$(VERSION) >/dev/null 2>&1; then docker rmi -f $(DOCKER_REPO):$(VERSION); fi
+	@rm -rf .container-* .dockerfile* .push-* linux darwin windows container VERSION.txt .docker_image
 
 bin-clean:
 	$(shell rm -rf $(GOTMP) bin .tmp)
