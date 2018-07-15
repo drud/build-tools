@@ -263,6 +263,24 @@ func TestGoMetalinter(t *testing.T) {
 	a.Contains(string(v), "this value of err is never used (SA4006) (staticcheck)")
 
 	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
-	_, err = exec.Command("make", "gometalinter", "SRC_DIRS=pkg/clean").Output()
-	a.NoError(err) // Should have no complaints in clean package
+	out, err := exec.Command("make", "gometalinter", "SRC_DIRS=pkg/clean").Output()
+	a.NoError(err, "Failed to get clean result for gometalinter: %v (output=%s)", err, out) // Should have no complaints in clean package
+}
+
+// Test golangci-lint.
+func TestGolangciLint(t *testing.T) {
+	a := assert.New(t)
+
+	// Test "make gometalinter"
+	v, err := exec.Command("make", "golangci-lint").Output()
+	a.Error(err) // Should complain about pretty much everything in the dirtyComplex package.
+	a.Contains(string(v), "don't use MixedCaps in package name; dirtyComplex should be dirtycomplex")
+	a.Contains(string(v), "don't use underscores in Go names; func DummyExported_function should be DummyExportedFunction (golint)")
+	a.Contains(string(v), "File is not gofmt-ed with -s (gofmt)")
+	a.Contains(string(v), "ineffectual assignment to `num` (ineffassign)")
+	a.Contains(string(v), "yetAnotherExportedFunction` is unused (deadcode)")
+	a.Contains(string(v), "Error return value of `os.Chown` is not checked (errcheck)")
+
+	out, err := exec.Command("make", "golangci-lint", "SRC_DIRS=pkg/clean").Output()
+	a.NoError(err, "Failed to get clean result for golangci-lint: %v (output=%s)", err, out) // Should have no complaints in clean package
 }

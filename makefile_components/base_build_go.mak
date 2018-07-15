@@ -23,7 +23,7 @@ SRC_AND_UNDER = $(patsubst %,./%/...,$(SRC_DIRS))
 
 GOMETALINTER_ARGS ?= --vendored-linters --disable-all --enable=gofmt --enable=vet --enable=vetshadow --enable=golint --enable=errcheck --enable=staticcheck --enable=ineffassign --enable=varcheck --enable=deadcode --deadline=2m
 
-GOLANGCI_LINT_ARGS ?= --disable-all --enable=gofmt --enable=govet --enable=golint --enable=errcheck --enable=staticcheck --enable=ineffassign --enable=varcheck --enable=deadcode
+GOLANGCI_LINT_ARGS ?= --out-format=line-number --disable-all --enable=gofmt --enable=govet --enable=golint --enable=errcheck --enable=staticcheck --enable=ineffassign --enable=varcheck --enable=deadcode
 
 COMMIT := $(shell git describe --tags --always --dirty)
 BUILDINFO = $(shell echo Built $$(date) $$(whoami)@$$(hostname) $(BUILD_IMAGE) )
@@ -161,16 +161,16 @@ gometalinter:
 		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
 		-w $(S)/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
-		gometalinter $(GOMETALINTER_ARGS) $(SRC_AND_UNDER)
+		time gometalinter $(GOMETALINTER_ARGS) $(SRC_AND_UNDER)
 
 golangci-lint:
 	@echo "golangci-lint: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+	docker run -t --rm -u $(shell id -u):$(shell id -g)                       \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                            \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                          \
 		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                     \
-		golangci-lint run $(GOLANGCI_LINT_ARGS) $(SRC_AND_UNDER)
+		$(BUILD_IMAGE)                                                         \
+		time bash -c "golangci-lint run $(GOLANGCI_LINT_ARGS) $(SRC_AND_UNDER)"
 
 version:
 	@echo VERSION:$(VERSION)
