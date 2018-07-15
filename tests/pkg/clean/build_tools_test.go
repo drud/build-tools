@@ -270,6 +270,9 @@ func TestGoMetalinter(t *testing.T) {
 // Test golangci-lint.
 func TestGolangciLint(t *testing.T) {
 	a := assert.New(t)
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping TestGolangciLint on Windows; golangci-lint fails with dockertoolbox, see https://github.com/golangci/golangci-worker/blob/caca2738602c324b1a1d6633ad959aa6d883f2df/app/analyze/executors/temp_dir_shell.go#L27")
+	}
 
 	// Test "make gometalinter"
 	v, err := exec.Command("make", "golangci-lint").Output()
