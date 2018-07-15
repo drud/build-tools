@@ -51,11 +51,11 @@ linux darwin windows: $(GOFILES)
 	@$(shell rm -f VERSION.txt)
 	@$(shell mkdir -p bin/$@ $(GOTMP)/{std/$@,bin,src/$(PKG)})
 	docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-	    -v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                   \
-	    -v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                 \
-	    -v $(DOCKER_EXTRA_SLASH)$(PWD)/bin/$@:/go/bin$(DOCKERMOUNTFLAG)                         \
-	    -v $(DOCKER_EXTRA_SLASH)$(PWD)/bin/$@:/go/bin/$@$(DOCKERMOUNTFLAG)                 \
-	    -v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP)/std/$@:/usr/local/go/pkg/$@_amd64_static$(DOCKERMOUNTFLAG)  \
+	    -v "$(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
+	    -v "$(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)"                              \
+	    -v "$(DOCKER_EXTRA_SLASH)$(PWD)/bin/$@:/go/bin$(DOCKERMOUNTFLAG)"                        \
+	    -v "$(DOCKER_EXTRA_SLASH)$(PWD)/bin/$@:/go/bin/$@$(DOCKERMOUNTFLAG)"             \
+	    -v "$(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP)/std/$@:/usr/local/go/pkg/$@_amd64_static$(DOCKERMOUNTFLAG)"  \
 	    -e CGO_ENABLED=0                  \
 	    -e GOOS=$@						  \
 	    -w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                 \
