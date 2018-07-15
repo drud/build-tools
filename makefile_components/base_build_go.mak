@@ -35,30 +35,28 @@ LDFLAGS := -extldflags -static $(VERSION_LDFLAGS)
 DOCKERMOUNTFLAG := :delegated
 
 PWD=$(shell pwd)
-DOCKER_EXTRA_SLASH=
+S =
 ifeq ($(BUILD_OS),windows)
-    TMPPWD=$(shell cmd /C echo %cd%)
-    PWD=$(shell echo "$(TMPPWD)" | awk '{gsub("\\\\", "/"); print}' )
     # On Windows docker toolbox, volume mounts oddly need a // at the beginning for things to work out, so
     # add that extra slash only on Windows.
-    DOCKER_EXTRA_SLASH=/
+    S=/
 endif
 
-build: linux darwin
+build: $(BUILD_OS)
 
 linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@$(shell rm -f VERSION.txt)
 	@$(shell mkdir -p bin/$@ $(GOTMP)/{std/$@,bin,src/$(PKG)})
 	docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-	    -v "$(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
-	    -v "$(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)"                              \
-	    -v "$(DOCKER_EXTRA_SLASH)$(PWD)/bin/$@:/go/bin$(DOCKERMOUNTFLAG)"                        \
-	    -v "$(DOCKER_EXTRA_SLASH)$(PWD)/bin/$@:/go/bin/$@$(DOCKERMOUNTFLAG)"             \
-	    -v "$(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP)/std/$@:/usr/local/go/pkg/$@_amd64_static$(DOCKERMOUNTFLAG)"  \
+	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
+	    -v "$(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)"                              \
+	    -v "$(S)$$PWD/bin/$@:/go/bin$(DOCKERMOUNTFLAG)"                        \
+	    -v "$(S)$$PWD/bin/$@:/go/bin/$@$(DOCKERMOUNTFLAG)"             \
+	    -v "$(S)$$PWD/$(GOTMP)/std/$@:/usr/local/go/pkg/$@_amd64_static$(DOCKERMOUNTFLAG)"  \
 	    -e CGO_ENABLED=0                  \
 	    -e GOOS=$@						  \
-	    -w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                 \
+	    -w $(S)/go/src/$(PKG)                 \
 	    $(BUILD_IMAGE)                    \
         go install -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER)
 	@$(shell touch $@)
@@ -67,72 +65,72 @@ linux darwin windows: $(GOFILES)
 govendor:
 	@echo -n "Using govendor to check for missing dependencies and unused dependencies: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                   \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                  \
-		-w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                                         \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                   \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                  \
+		-w $(S)/go/src/$(PKG)                                         \
 		$(BUILD_IMAGE)                                                     \
 		bash -c 'OUT=$$(govendor list +missing +unused); if [ -n "$$OUT" ]; then echo "$$OUT"; exit 1; fi'
 
 gofmt:
 	@echo "Checking gofmt: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                                                  \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+		-w $(S)/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
 		bash -c 'export OUT=$$(gofmt -l $(SRC_DIRS))  && if [ -n "$$OUT" ]; then echo "These files need gofmt -w: $$OUT"; exit 1; fi'
 
 govet:
 	@echo "Checking go vet: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $DOCKER_EXTRA_SLASH/go/src/$(PKG)                                                  \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+		-w $S/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
 		bash -c 'go vet $(SRC_AND_UNDER)'
 
 golint:
 	@echo "Checking golint: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                   \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                                                  \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+		-w $(S)/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
 		bash -c 'export OUT=$$(golint $(SRC_AND_UNDER)) && if [ -n "$$OUT" ]; then echo "Golint problems discovered: $$OUT"; exit 1; fi'
 
 errcheck:
 	@echo "Checking errcheck: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                   \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                                                  \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+		-w $(S)/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
 		errcheck $(SRC_AND_UNDER)
 
 staticcheck:
 	@echo "Checking staticcheck: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                                                  \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+		-w $(S)/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
 		staticcheck $(SRC_AND_UNDER)
 
 unused:
 	@echo "Checking unused variables and functions: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                                                  \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+		-w $(S)/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
 		unused $(SRC_AND_UNDER)
 
 codecoroner:
 	@echo "Checking codecoroner for unused functions: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                                                  \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+		-w $(S)/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE) \
 		bash -c 'OUT=$$(codecoroner -tests -ignore vendor funcs $(SRC_AND_UNDER)); if [ -n "$$OUT" ]; then echo "$$OUT"; exit 1; fi'                                             \
 
@@ -140,27 +138,27 @@ codecoroner:
 varcheck:
 	@echo "Checking unused globals and struct members: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                                                  \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+		-w $(S)/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
 		varcheck $(SRC_AND_UNDER) && structcheck $(SRC_AND_UNDER)
 
 misspell:
 	@echo "Checking for misspellings: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                                                  \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+		-w $(S)/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
 		misspell $(SRC_DIRS)
 
 gometalinter:
 	@echo "gometalinter: "
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(DOCKER_EXTRA_SLASH)$(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(DOCKER_EXTRA_SLASH)/go/src/$(PKG)                                                  \
+		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
+		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
+		-w $(S)/go/src/$(PKG)                                                  \
 		$(BUILD_IMAGE)                                                     \
 		gometalinter $(GOMETALINTER_ARGS) $(SRC_AND_UNDER)
 
