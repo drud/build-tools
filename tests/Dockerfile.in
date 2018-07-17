@@ -1,5 +1,0 @@
-FROM UPSTREAM_REPO
-
-RUN apk update && apk add git bash build-base
-
-# This is a dummy Dockerfile
