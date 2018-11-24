@@ -49,6 +49,7 @@ linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@$(shell rm -f VERSION.txt)
 	@$(shell mkdir -p bin/$@ $(GOTMP)/{std/$@,bin,src/$(PKG)})
+	@$(shell set -x;  if [ -f ./go.mod ] ; then GOPATH=$$PWD/$(GOTMP) go get ./...;  fi; set +x; )
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
 	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
 	    -v "$(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)"                              \
