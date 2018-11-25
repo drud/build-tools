@@ -66,4 +66,21 @@ test: build
 test_precompile: TESTARGS=-run '^$$'
 test_precompile: test
 
+# Simple way to execute a random command in the container for tests - used only for testing
+# Example: make COMMAND="govendor fetch golang.org/x/net/context"
+# COMMAND := govendor list
+container_cmd:
+	@$(shell if [ -f ./go.mod ] ; then GOPATH=$$PWD/$(GOTMP) go get ./...;  fi; )
+	@docker run                                                            \
+		-t --rm -u $(shell id -u):$(shell id -g)                         \
+	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
+	    -v "$(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)"                              \
+	    -v "$(S)$$PWD/bin/$@:/go/bin$(DOCKERMOUNTFLAG)"                        \
+	    -v "$(S)$$PWD/bin/$@:/go/bin/$@$(DOCKERMOUNTFLAG)"             \
+	    -v "$(S)$$PWD/$(GOTMP)/std/$@:/usr/local/go/pkg/$@_amd64_static$(DOCKERMOUNTFLAG)"  \
+	    -e CGO_ENABLED=0                  \
+	    -e GOOS=$@						  \
+	    -w $(S)/go/src/$(PKG)                 \
+	    $(BUILD_IMAGE)                    \
+		$(COMMAND)
 
