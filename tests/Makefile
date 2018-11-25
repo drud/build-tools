@@ -58,6 +58,8 @@ test: build
 	@mkdir -p  $(GOTMP)/{src/$(PKG),pkg,bin,std/linux}
 	go test -v -installsuffix "static" -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
 	$(MAKE) -C standard_target $@
+	$(MAKE) -C with_vendor $@
+
 
 # test_precompile allows a full compilation of _test.go files, without execution of the tests.
 # Setup and teardown in TestMain is still executed though, so this can cost some time.
