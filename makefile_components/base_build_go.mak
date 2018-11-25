@@ -183,7 +183,7 @@ container-clean:
 	@rm -rf .container-* .dockerfile* .push-* linux darwin windows container VERSION.txt .docker_image
 
 bin-clean:
-	$(shell rm -rf $(GOTMP) bin .tmp)
+	$(shell chmod -R u+w $(GOTMP) && rm -rf $(GOTMP) bin .tmp)
 
 # print-ANYVAR prints the expanded variable
 print-%: ; @echo $* = $($*)
