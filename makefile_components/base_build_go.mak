@@ -5,7 +5,7 @@
 ##### comment about what you did and why.
 
 
-.PHONY: all build test push clean container-clean bin-clean version static govendor gofmt govet golint golangci-lint container
+.PHONY: all build test push clean container-clean bin-clean version static gofmt govet golint golangci-lint container
 GOTMP=.gotmp
 
 SHELL = /bin/bash
@@ -63,15 +63,6 @@ linux darwin windows: $(GOFILES)
         go install -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER)
 	@$(shell touch $@)
 	@echo $(VERSION) >VERSION.txt
-
-govendor:
-	@echo -n "Using govendor to check for missing dependencies and unused dependencies: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                   \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                  \
-		-w $(S)/go/src/$(PKG)                                         \
-		$(BUILD_IMAGE)                                                     \
-		bash -c 'OUT=$$(govendor list +missing +unused); if [ -n "$$OUT" ]; then echo "$$OUT"; exit 1; fi'
 
 gofmt:
 	@echo "Checking gofmt: "

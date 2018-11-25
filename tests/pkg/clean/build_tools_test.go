@@ -102,53 +102,6 @@ func TestGoFmt(t *testing.T) {
 
 }
 
-// Use govendor with extra and missing items
-// There is some danger here that failure can leave the vendor directory with changed items.
-// Note that the spare make target "make container_cmd" is used as a generic way to execute govendor in the container.
-// The COMMAND=some command argument to exec.Command() is an oddity - due to the way this argument is processed,
-// it must not be escaped.
-func TestGovendor(t *testing.T) {
-	a := assert.New(t)
-
-	simpleExtraPackage := "golang.org/x/net/context"
-	neededPackage := "github.com/stretchr/testify/assert"
-
-	// Test "make govendor"
-	_, err := exec.Command("make", "govendor").Output()
-	a.NoError(err) // Base code should have no errors
-
-	// Add an unused vendor item (net/context) and check that our govendor now fails
-	v, err := exec.Command("make", "COMMAND=govendor fetch "+simpleExtraPackage, "container_cmd").Output()
-	a.NoError(err, "Failed 'govendor fetch %v', result=%v", simpleExtraPackage, string(v))
-
-	v, err = exec.Command("make", "govendor").Output()
-	a.Error(err) // We should have an error now, with unused item
-	a.Contains(string(v), "u "+simpleExtraPackage)
-
-	// Remove the extra item
-	_, err = exec.Command("make", "COMMAND=govendor remove "+simpleExtraPackage, "container_cmd").Output()
-	a.NoError(err)
-	// Test "make govendor" - should be back to no errors
-	_, err = exec.Command("make", "govendor").Output()
-	a.NoError(err) // Base code should have no errors
-
-	// Remove a necessary package
-	_, err = exec.Command("make", "COMMAND=govendor remove "+neededPackage, "container_cmd").Output()
-	a.NoError(err)
-	// Test "make govendor" - should show assert as a missing item
-	v, err = exec.Command("make", "govendor").Output()
-	a.Error(err)
-	a.Contains(string(v), "m "+neededPackage)
-
-	_, err = exec.Command("make", "COMMAND=govendor fetch "+neededPackage, "container_cmd").Output()
-	a.NoError(err)
-
-	// Try to clean up the mess we may have made in the vendor directory
-	_, _ = exec.Command("git", "checkout vendor").Output()
-	_, _ = exec.Command("git", "clean -fd vendor").Output()
-
-}
-
 // Test golint on clean and unclean code
 func TestGoLint(t *testing.T) {
 	a := assert.New(t)
