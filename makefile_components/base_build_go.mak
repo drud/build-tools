@@ -177,7 +177,6 @@ version:
 	@echo VERSION:$(VERSION)
 
 clean: container-clean bin-clean
-	@go clean -cache || echo "You're not running latest golang locally" # Make sure the local go cache is clean for testing
 
 container-clean:
 	@if docker image inspect $(DOCKER_REPO):$(VERSION) >/dev/null 2>&1; then docker rmi -f $(DOCKER_REPO):$(VERSION); fi
