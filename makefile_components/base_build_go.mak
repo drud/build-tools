@@ -14,7 +14,7 @@ GOFILES = $(shell find $(SRC_DIRS) -name "*.go")
 
 BUILD_OS = $(shell go env GOHOSTOS)
 
-BUILD_IMAGE ?= drud/golang-build-container:v1.11.2
+BUILD_IMAGE ?= drud/golang-build-container:v1.11.4
 
 BUILD_BASE_DIR ?= $$PWD
 
@@ -49,16 +49,16 @@ linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@$(shell rm -f VERSION.txt)
 	@$(shell mkdir -p bin/$@ $(GOTMP)/{std/$@,bin,src/$(PKG)})
-	@$(shell if [ -f ./go.mod ] ; then GOPATH=$$PWD/$(GOTMP) go get ./...;  fi; )
+	# @$(shell if [ -f ./go.mod ] ; then GOPATH=$$PWD/$(GOTMP) go get ./...;  fi; )
 	@docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
 	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
-	    -v "$(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)"                              \
+	    -v "$(S)$$PWD:/workdir$(DOCKERMOUNTFLAG)"                              \
 	    -v "$(S)$$PWD/bin/$@:/go/bin$(DOCKERMOUNTFLAG)"                        \
 	    -v "$(S)$$PWD/bin/$@:/go/bin/$@$(DOCKERMOUNTFLAG)"             \
 	    -v "$(S)$$PWD/$(GOTMP)/std/$@:/usr/local/go/pkg/$@_amd64_static$(DOCKERMOUNTFLAG)"  \
 	    -e CGO_ENABLED=0                  \
 	    -e GOOS=$@						  \
-	    -w $(S)/go/src/$(PKG)                 \
+	    -w $(S)/workdir              \
 	    $(BUILD_IMAGE)                    \
         go install -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER)
 	@$(shell touch $@)
@@ -174,7 +174,7 @@ container-clean:
 	@rm -rf .container-* .dockerfile* .push-* linux darwin windows container VERSION.txt .docker_image
 
 bin-clean:
-	$(shell chmod -R u+w $(GOTMP) && rm -rf $(GOTMP) bin .tmp)
+	$(shell if [ -d $(GOTMP) ]; then chmod -R u+w $(GOTMP) && rm -rf $(GOTMP); fi )
 
 # print-ANYVAR prints the expanded variable
 print-%: ; @echo $* = $($*)
