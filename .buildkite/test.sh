@@ -9,7 +9,7 @@ set -o nounset
 set -x
 
 BUILD_OS=$(go env GOOS)
-echo "--- buildkite building $BUILDKITE_JOB_ID at $(date) on $HOSTNAME for OS=$(go env GOOS) in $PWD GOPATH=$GOPATH"
+echo "--- buildkite building $BUILDKITE_JOB_ID at $(date) on $HOSTNAME for OS=$(go env GOOS) in $PWD"
 
 # Our testbot should now be sane, run the testbot checker to make sure.
 echo "--- Checking for sane testbot"
