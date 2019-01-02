@@ -13,6 +13,14 @@ UPSTREAM_REPO ?= golang:1.7.5-alpine3.5
 
 export WORKING_DIR = $(shell pwd)
 
+TESTDOCKERCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
+          	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
+          	    -v "$(S)$$PWD:/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -v "$(S)$$PWD/$(GOTMP)/std/$@:/usr/local/go/pkg/$@_amd64_static$(DOCKERMOUNTFLAG)"  \
+          	    -w $(S)/workdir              \
+          	    $(BUILD_IMAGE)
+
+
 # Top-level directories to build - Only build the explicit complex fail stuff by default. Unit test will be overridden.
 SRC_DIRS := cmd pkg
 
@@ -54,11 +62,8 @@ include ../makefile_components/base_push.mak
 # We can't use the standard 'test' target because this one actually uses 'make' and counts on resources unavailable in
 # golang compiler container.
 test: build
-	@mkdir -p bin/linux
-	@mkdir -p  $(GOTMP)/{src/$(PKG),pkg,bin,std/linux}
-	go test -v -installsuffix "static" -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
-	$(MAKE) -C standard_target $@
-	$(MAKE) -C with_vendor $@
+	@go test -v -installsuffix "static" -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
+	@$(MAKE) -C standard_target $@
 
 
 # test_precompile allows a full compilation of _test.go files, without execution of the tests.
@@ -70,17 +75,7 @@ test_precompile: test
 # Example: make COMMAND="govendor fetch golang.org/x/net/context"
 # COMMAND := govendor list
 container_cmd:
-	@$(shell if [ -f ./go.mod ] ; then GOPATH=$$PWD/$(GOTMP) go get ./...;  fi; )
-	@docker run                                                            \
-		-t --rm -u $(shell id -u):$(shell id -g)                         \
-	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
-	    -v "$(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)"                              \
-	    -v "$(S)$$PWD/bin/$@:/go/bin$(DOCKERMOUNTFLAG)"                        \
-	    -v "$(S)$$PWD/bin/$@:/go/bin/$@$(DOCKERMOUNTFLAG)"             \
-	    -v "$(S)$$PWD/$(GOTMP)/std/$@:/usr/local/go/pkg/$@_amd64_static$(DOCKERMOUNTFLAG)"  \
-	    -e CGO_ENABLED=0                  \
-	    -e GOOS=$@						  \
-	    -w $(S)/go/src/$(PKG)                 \
-	    $(BUILD_IMAGE)                    \
+	#@$(shell if [ -f ./go.mod ] ; then GOPATH=$$PWD/$(GOTMP) go get ./...;  fi; )
+	@$(TESTDOCKERCMD) \
 		$(COMMAND)
 
