@@ -3,7 +3,6 @@ stages:
   build:
     machine:
       image: circleci/classic:201711-01
-    working_directory: build-tools
 
     environment:
       GOPATH: /home/circleci/go
