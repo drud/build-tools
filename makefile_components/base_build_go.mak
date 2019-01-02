@@ -4,6 +4,19 @@
 ##### contents into ../Makefile and commenting out the include and adding a
 ##### comment about what you did and why.
 
+DOCKERBUILDCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
+          	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
+          	    -v "$(S)$$PWD:/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -e CGO_ENABLED=0                  \
+          	    -e GOOS=$@						  \
+          	    -w $(S)/workdir              \
+          	    $(BUILD_IMAGE)
+
+DOCKERTESTCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
+          	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
+          	    -v "$(S)$$PWD:/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -w $(S)/workdir              \
+          	    $(BUILD_IMAGE)
 
 .PHONY: all build test push clean container-clean bin-clean version static gofmt govet golint golangci-lint container
 GOTMP=.gotmp
@@ -15,6 +28,9 @@ GOFILES = $(shell find $(SRC_DIRS) -name "*.go")
 BUILD_OS = $(shell go env GOHOSTOS)
 
 BUILD_IMAGE ?= drud/golang-build-container:v1.11.4
+
+# TODO: Don't forget to remove this and get the official one in there
+BUILD_IMAGE := drud/golang-build-container:20190102_newer_tools
 
 BUILD_BASE_DIR ?= $$PWD
 
@@ -47,118 +63,54 @@ build: $(BUILD_OS)
 
 linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
-	    -v "$(S)$$PWD:/workdir$(DOCKERMOUNTFLAG)"                              \
-	    -v "$(S)$$PWD/bin/$@:/go/bin$(DOCKERMOUNTFLAG)"                        \
-	    -v "$(S)$$PWD/bin/$@:/go/bin/$@$(DOCKERMOUNTFLAG)"             \
-	    -v "$(S)$$PWD/$(GOTMP)/std/$@:/usr/local/go/pkg/$@_amd64_static$(DOCKERMOUNTFLAG)"  \
-	    -e CGO_ENABLED=0                  \
-	    -e GOOS=$@						  \
-	    -w $(S)/workdir              \
-	    $(BUILD_IMAGE)                    \
+	@$(DOCKERBUILDCMD) \
         go install -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER)
 	@$(shell touch $@)
 	@echo $(VERSION) >VERSION.txt
 
 gofmt:
 	@echo "Checking gofmt: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                     \
+	@$(DOCKERTESTCMD) \
 		bash -c 'export OUT=$$(gofmt -l $(SRC_DIRS))  && if [ -n "$$OUT" ]; then echo "These files need gofmt -w: $$OUT"; exit 1; fi'
 
 govet:
 	@echo "Checking go vet: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $S/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                     \
+	@$(DOCKERTESTCMD) \
 		bash -c 'go vet $(SRC_AND_UNDER)'
 
 golint:
 	@echo "Checking golint: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                   \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                     \
+	@$(DOCKERTESTCMD) \
 		bash -c 'export OUT=$$(golint $(SRC_AND_UNDER)) && if [ -n "$$OUT" ]; then echo "Golint problems discovered: $$OUT"; exit 1; fi'
 
 errcheck:
 	@echo "Checking errcheck: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                   \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                     \
+	@$(DOCKERTESTCMD) \
 		errcheck $(SRC_AND_UNDER)
 
 staticcheck:
 	@echo "Checking staticcheck: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                     \
+	@$(DOCKERTESTCMD) \
 		staticcheck $(SRC_AND_UNDER)
-
-unused:
-	@echo "Checking unused variables and functions: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                     \
-		unused $(SRC_AND_UNDER)
-
-codecoroner:
-	@echo "Checking codecoroner for unused functions: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE) \
-		bash -c 'OUT=$$(codecoroner -tests -ignore vendor funcs $(SRC_AND_UNDER)); if [ -n "$$OUT" ]; then echo "$$OUT"; exit 1; fi'                                             \
-
 
 varcheck:
 	@echo "Checking unused globals and struct members: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                     \
-		varcheck $(SRC_AND_UNDER) && structcheck $(SRC_AND_UNDER)
+	@$(DOCKERTESTCMD) \
+		bash -c "varcheck $(SRC_AND_UNDER) && structcheck $(SRC_AND_UNDER)"
 
 misspell:
 	@echo "Checking for misspellings: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                     \
+	@$(DOCKERTESTCMD) \
 		misspell $(SRC_DIRS)
 
 gometalinter:
 	@echo "gometalinter: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                         \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                     \
+	@$(DOCKERTESTCMD) \
 		time gometalinter $(GOMETALINTER_ARGS) $(SRC_AND_UNDER)
 
 golangci-lint:
 	@echo "golangci-lint: "
-	@docker run -t --rm -u $(shell id -u):$(shell id -g)                       \
-		-v $(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)                            \
-		-v $(S)$$PWD:/go/src/$(PKG)$(DOCKERMOUNTFLAG)                          \
-		-w $(S)/go/src/$(PKG)                                                  \
-		$(BUILD_IMAGE)                                                         \
+	@$(DOCKERTESTCMD) \
 		time bash -c "golangci-lint run $(GOLANGCI_LINT_ARGS) $(SRC_AND_UNDER)"
 
 version:
