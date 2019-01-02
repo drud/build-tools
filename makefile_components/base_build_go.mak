@@ -27,10 +27,7 @@ GOFILES = $(shell find $(SRC_DIRS) -name "*.go")
 
 BUILD_OS = $(shell go env GOHOSTOS)
 
-BUILD_IMAGE ?= drud/golang-build-container:v1.11.4
-
-# TODO: Don't forget to remove this and get the official one in there
-BUILD_IMAGE := drud/golang-build-container:20190102_newer_tools
+BUILD_IMAGE ?= drud/golang-build-container:v1.11.4.2
 
 BUILD_BASE_DIR ?= $$PWD
 
