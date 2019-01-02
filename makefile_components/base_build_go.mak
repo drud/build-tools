@@ -60,6 +60,7 @@ build: $(BUILD_OS)
 
 linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
+	@mkdir -p $(GOTMP)/{.cache,pkg,src,bin}
 	@$(DOCKERBUILDCMD) \
         go install -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER)
 	@$(shell touch $@)
