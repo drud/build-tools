@@ -35,7 +35,7 @@ func TestBuild(t *testing.T) {
 	// Map OS name to output location
 	binlocs := map[string]string{
 		"darwin":  ".gotmp/bin/darwin_amd64/build_tools_dummy",
-		"linux":   ".gotmp/bin/linux/build_tools_dummy",
+		"linux":   ".gotmp/bin/build_tools_dummy",
 		"windows": ".gotmp/bin/windows_amd64/build_tools_dummy.exe",
 	}
 
