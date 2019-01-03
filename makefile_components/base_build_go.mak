@@ -64,6 +64,7 @@ linux darwin windows: $(GOFILES)
 	@$(DOCKERBUILDCMD) \
         go install -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER)
 	@$(shell touch $@)
+	@$(shell chmod -R u+w $(GOTMP))
 	@echo $(VERSION) >VERSION.txt
 
 gofmt:
