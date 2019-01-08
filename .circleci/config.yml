@@ -3,17 +3,14 @@ stages:
   build:
     machine:
       image: circleci/classic:201711-01
-    working_directory: /home/circleci/go/src/github.com/drud/build-tools
 
     environment:
       GOPATH: /home/circleci/go
 
     steps:
       - run: sudo rm -rf /usr/local/go &&
-             wget -q -O /tmp/golang.tgz https://dl.google.com/go/go1.11.linux-amd64.tar.gz &&
+             wget -q -O /tmp/golang.tgz https://dl.google.com/go/go1.11.4.linux-amd64.tar.gz &&
              sudo tar -C /usr/local -xzf /tmp/golang.tgz
-
-      - run: mkdir -p ~/go/src/github.com/drud/build-tools && mkdir -p ~/go/lib && mkdir -p ~/go/bin
 
       - checkout
 
