@@ -62,7 +62,7 @@ include ../makefile_components/base_push.mak
 # We can't use the standard 'test' target because this one actually uses 'make' and counts on resources unavailable in
 # golang compiler container.
 test: build
-	@go test -v -installsuffix "static" -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
+	@go test $(USEMODVENDOR) -v -installsuffix "static" -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
 	@$(MAKE) -C standard_target $@
 
 
