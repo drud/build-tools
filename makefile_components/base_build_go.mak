@@ -5,16 +5,16 @@
 ##### comment about what you did and why.
 
 DOCKERBUILDCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-          	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
-          	    -v "$(S)$$PWD:/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -v "$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
+          	    -v "$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
           	    -e CGO_ENABLED=0                  \
           	    -e GOOS=$@						  \
           	    -w $(S)/workdir              \
           	    $(BUILD_IMAGE)
 
 DOCKERTESTCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-          	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
-          	    -v "$(S)$$PWD:/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -v "$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
+          	    -v "$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
           	    -w $(S)/workdir              \
           	    $(BUILD_IMAGE)
 
@@ -29,7 +29,7 @@ BUILD_OS = $(shell go env GOHOSTOS)
 
 BUILD_IMAGE ?= drud/golang-build-container:v1.11.4.2
 
-BUILD_BASE_DIR ?= $$PWD
+BUILD_BASE_DIR ?= $(PWD)
 
 # Expands SRC_DIRS into the common golang ./dir/... format for "all below"
 SRC_AND_UNDER = $(patsubst %,./%/...,$(SRC_DIRS))
@@ -39,7 +39,7 @@ GOMETALINTER_ARGS ?= --vendored-linters --disable-all --enable=gofmt --enable=ve
 GOLANGCI_LINT_ARGS ?= --out-format=line-number --disable-all --enable=gofmt --enable=govet --enable=golint --enable=errcheck --enable=staticcheck --enable=ineffassign --enable=varcheck --enable=deadcode
 
 COMMIT := $(shell git describe --tags --always --dirty)
-BUILDINFO = $(shell echo Built $$(date) $$(whoami)@$$(hostname) $(BUILD_IMAGE) )
+BUILDINFO = $(shell echo Built $$(date) $(BUILD_IMAGE) )
 
 VERSION_VARIABLES += VERSION COMMIT BUILDINFO
 
@@ -52,13 +52,12 @@ DOCKERMOUNTFLAG := :delegated
 # See https://github.com/golang/go/issues/27227
 USEMODVENDOR := $(shell if [ -d vendor ]; then echo "-mod=vendor"; fi)
 
-
-PWD=$(shell pwd)
-S =
 ifeq ($(BUILD_OS),windows)
     # On Windows docker toolbox, volume mounts oddly need a // at the beginning for things to work out, so
     # add that extra slash only on Windows.
     S=/
+    PWD=$(shell cmd //c "echo %cd%")
+    DOCKERMOUNTFLAG=
 endif
 
 build: $(BUILD_OS)

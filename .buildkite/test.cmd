@@ -1,4 +1,4 @@
-@echo "Building using bash and build.sh"
+@echo "Building using bash and build.sh PWD=%cd%"
 "C:\Program Files\git\bin\bash" .buildkite/test.sh
 
 if %ERRORLEVEL% EQU 0 (

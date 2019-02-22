@@ -12,7 +12,7 @@ test: build
 	@docker run -t --rm  -u $(shell id -u):$(shell id -g)                 \
 	    -v $(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)                                                 \
 	    -v $(PWD):/go/src/$(PKG)$(DOCKERMOUNTFLAG)                                          \
-	    -v $(PWD)/bin/linux:/go/bin$(DOCKERMOUNTFLAG)                                     \
+	    -v $(PWD)/$(GOTMP)/bin:/go/bin$(DOCKERMOUNTFLAG)                                     \
 	    -v $(PWD)/$(GOTMP)/std/linux:/usr/local/go/pkg/linux_amd64_static$(DOCKERMOUNTFLAG)  \
 	    -e CGO_ENABLED=0	\
 	    -w /go/src/$(PKG)                                                  \
