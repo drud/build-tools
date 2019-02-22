@@ -9,13 +9,7 @@ TESTOS = $(BUILD_OS)
 test: build
 	@echo "Testing $(SRC_AND_UNDER) with TESTARGS=$(TESTARGS)"
 	@mkdir -p $(GOTMP)/{.cache,pkg,src,bin}
-	docker run -t --rm  -u $(shell id -u):$(shell id -g)                 \
-	    -v $(PWD):/workdir           \
-	    -v $(PWD)/$(GOTMP)/bin:/go/bin                 \
-	    -e CGO_ENABLED=0	\
-	    -e GOPATH=/workdir/.gotmp \
-	    -w /workdir                                                  \
-	    $(BUILD_IMAGE)                                                     \
+	$(DOCKERTESTCMD) \
         go test $(USEMODVENDOR) -v -installsuffix static -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
 	@$(shell chmod -R u+w $(GOTMP))
 

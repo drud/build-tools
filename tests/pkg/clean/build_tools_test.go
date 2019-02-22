@@ -53,12 +53,12 @@ func TestBuild(t *testing.T) {
 		log.Fatalln("make version in", dir, "failed, so exiting. output=", string(v))
 	}
 
-	// Run a make clean to start with; linux requires sudo because container left things a mess
-	v, err = exec.Command("make", "clean").Output()
-	a.NoError(err, "make clean failed. output="+string(v))
+	// Make sure it builds from scratch, but don't delete our pkg cache
+	v, err = exec.Command("rm", "-f", "darwin", "linux", "windows").Output()
+	a.NoError(err, "error output from rm: %v", string(v))
 
 	// Build darwin and linux cmds
-	v, err = exec.Command("make", "darwin").Output()
+	v, err = exec.Command("bash", "-c", "pwd && make darwin").Output()
 	a.NoError(err, "Failed to 'make darwin'")
 	a.Contains(string(v), "building darwin")
 
@@ -91,7 +91,7 @@ func TestGoFmt(t *testing.T) {
 	a := assert.New(t)
 
 	// Test "make gofmt
-	v, err := exec.Command("make", "gofmt").Output()
+	v, err := exec.Command("bash", "-c", "pwd && make gofmt").Output()
 	a.Error(err) // We should have an error with bad_gofmt_code.go
 	a.Contains(string(v), "pkg/dirtyComplex/bad_gofmt_code.go")
 
@@ -106,7 +106,7 @@ func TestGoLint(t *testing.T) {
 	a := assert.New(t)
 
 	// Test "make golint"
-	v, err := exec.Command("make", "golint").Output()
+	v, err := exec.Command("bash", "-c", "pwd && make golint").Output()
 	a.Error(err) // Should have one complaint about gofmtproblem.go
 	a.Contains(string(v), "exported function DummyExported_function should have comment")
 
@@ -121,13 +121,13 @@ func TestGoVet(t *testing.T) {
 
 	// cmd/gofmtproblem/gofmtproblem.go
 	// Test "make govet"
-	v, err := exec.Command("make", "govet").Output()
+	v, err := exec.Command("bash", "-c", "pwd && make govet").Output()
 	a.Error(err) // Should have one complaint about gofmtproblem.go
 	a.Contains(string(v), "pkg/dirtyComplex/bad_govet_code.go")
 
 	// Test "make SRC_DIRS=pkg govet" to limit to just clean directories
-	_, err = exec.Command("make", "govet", "SRC_DIRS=pkg/clean").Output()
-	a.NoError(err) // Should have no complaints in clean package
+	v, err = exec.Command("bash", "-c", "pwd && make govet SRC_DIRS=pkg/clean").Output()
+	a.NoError(err, "error output from make govet: %v", string(v)) // Should have no complaints in clean package
 }
 
 // Test errcheck.
@@ -137,12 +137,12 @@ func TestErrCheck(t *testing.T) {
 
 	// pkg/dirtycomplex/bad_errcheck_code.go
 	// Test "make errcheck"
-	v, err := exec.Command("make", "errcheck").Output()
+	v, err := exec.Command("bash", "-c", "pwd && make errcheck").Output()
 	a.Error(err) // Should have one complaint about bad_errcheck_code.go
 	a.Contains(string(v), "pkg/dirtyComplex/bad_errcheck_code.go")
 
 	// Test "make SRC_DIRS=pkg errcheck" to limit to just clean directories
-	_, err = exec.Command("make", "errcheck", "SRC_DIRS=pkg/clean").Output()
+	_, err = exec.Command("bash", "-c", "pwd && make errcheck SRC_DIRS=pkg/clean").Output()
 	a.NoError(err) // Should have no complaints in clean package
 }
 
@@ -151,13 +151,13 @@ func TestStaticcheck(t *testing.T) {
 	a := assert.New(t)
 
 	// Test "make staticcheck"
-	v, err := exec.Command("make", "staticcheck").Output()
+	v, err := exec.Command("bash", "-c", "make staticcheck").Output()
 	a.Error(err) // Should have one complaint about bad_staticcheck_code.go
 	a.Contains(string(v), "pkg/dirtyComplex/bad_staticcheck_code.go")
 
 	// Test "make SRC_DIRS=pkg/clean staticcheck" to limit to just clean directories
-	_, err = exec.Command("make", "staticcheck", "SRC_DIRS=pkg/clean").Output()
-	a.NoError(err) // Should have no complaints in clean package
+	v, err = exec.Command("bash", "-c", "make staticcheck SRC_DIRS=pkg/clean").Output()
+	a.NoError(err, "error output from staticcheck: %v", string(v)) // Should have no complaints in clean package
 }
 
 // Test misspell.
@@ -165,30 +165,14 @@ func TestMisspell(t *testing.T) {
 	a := assert.New(t)
 
 	// Test "make codecoroner"
-	v, err := exec.Command("make", "--no-print-directory", "misspell").Output()
+	v, err := exec.Command("bash", "-c", "make --no-print-directory misspell").Output()
 	a.NoError(err)                                               // This one doesn't make an error return
 	a.Contains(string(v), " is a misspelling of \"misspelled\"") // Check an exported function
 
 	// Test "make SRC_DIRS=pkg/clean misspell" to limit to just clean directories
-	v, err = exec.Command("make", "--no-print-directory", "misspell", "SRC_DIRS=pkg/clean").Output()
+	v, err = exec.Command("bash", "-c", "make --no-print-directory misspell SRC_DIRS=pkg/clean").Output()
 	a.NoError(err) // Should have no complaints in clean package
 	a.Equal("Checking for misspellings: \n", string(v))
-}
-
-// Test gometalinter.
-func TestGoMetalinter(t *testing.T) {
-	a := assert.New(t)
-
-	// Test "make gometalinter"
-	v, err := exec.Command("make", "gometalinter").Output()
-	a.Error(err) // Should complain about pretty much everything in the dirtyComplex package.
-	a.Contains(string(v), "exported function DummyExported_function should have comment or be unexported (golint)")
-	a.Contains(string(v), "file is not gofmted with -s (gofmt)")
-	a.Contains(string(v), "this value of err is never used (SA4006) (staticcheck)")
-
-	// Test "make SRC_DIRS=pkg/clean codecoroner" to limit to just clean directories
-	out, err := exec.Command("make", "gometalinter", "SRC_DIRS=pkg/clean").Output()
-	a.NoError(err, "Failed to get clean result for gometalinter: %v (output=%s)", err, out) // Should have no complaints in clean package
 }
 
 // Test golangci-lint.
@@ -199,7 +183,7 @@ func TestGolangciLint(t *testing.T) {
 	}
 
 	// Test "make golangci-lint"
-	v, err := exec.Command("make", "golangci-lint").Output()
+	v, err := exec.Command("bash", "-c", "make golangci-lint").Output()
 	a.Error(err) // Should complain about pretty much everything in the dirtyComplex package.
 	execResult := string(v)
 	a.Contains(execResult, "don't use MixedCaps in package name; dirtyComplex should be dirtycomplex")
@@ -209,6 +193,6 @@ func TestGolangciLint(t *testing.T) {
 	a.Contains(execResult, "yetAnotherExportedFunction` is unused (deadcode)")
 	a.Contains(execResult, "Error return value of `os.Chown` is not checked (errcheck)")
 
-	out, err := exec.Command("make", "golangci-lint", "SRC_DIRS=pkg/clean").Output()
+	out, err := exec.Command("bash", "-c", "make golangci-lint SRC_DIRS=pkg/clean").Output()
 	a.NoError(err, "Failed to get clean result for golangci-lint: %v (output=%s)", err, out) // Should have no complaints in clean package
 }

@@ -9,11 +9,13 @@ DOCKERBUILDCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)              
           	    -v "$(PWD)/$(GOTMP)/bin:/go/bin" \
           	    -e CGO_ENABLED=0                  \
           	    -e GOOS=$@						  \
+          	    -e GOPATH=//workdir/$(GOTMP) \
           	    -w $(S)/workdir              \
           	    $(BUILD_IMAGE)
 
 DOCKERTESTCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
           	    -v "$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -e GOPATH=//workdir/$(GOTMP) \
           	    -w $(S)/workdir              \
           	    $(BUILD_IMAGE)
 
@@ -64,8 +66,8 @@ build: $(BUILD_OS)
 linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@mkdir -p $(GOTMP)/{.cache,pkg,src,bin}
-	@$(DOCKERBUILDCMD) \
-        go install $(USEMODVENDOR) -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER) && touch $@
+	$(DOCKERBUILDCMD) \
+        go install -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER) && touch $@
 	$( shell if [ -d $(GOTMP) ]; then chmod -R u+w $(GOTMP); fi )
 	@echo $(VERSION) >VERSION.txt
 
@@ -76,7 +78,7 @@ gofmt:
 
 govet:
 	@echo "Checking go vet: "
-	@$(DOCKERTESTCMD) \
+	$(DOCKERTESTCMD) \
 		bash -c 'go vet $(SRC_AND_UNDER)'
 
 golint:
