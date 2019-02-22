@@ -5,15 +5,14 @@
 ##### comment about what you did and why.
 
 DOCKERBUILDCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-          	    -v "$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
           	    -v "$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -v "$(PWD)/$(GOTMP)/bin:/go/bin" \
           	    -e CGO_ENABLED=0                  \
           	    -e GOOS=$@						  \
           	    -w $(S)/workdir              \
           	    $(BUILD_IMAGE)
 
 DOCKERTESTCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-          	    -v "$(PWD)/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
           	    -v "$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
           	    -w $(S)/workdir              \
           	    $(BUILD_IMAGE)
@@ -66,8 +65,7 @@ linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@mkdir -p $(GOTMP)/{.cache,pkg,src,bin}
 	@$(DOCKERBUILDCMD) \
-        go install $(USEMODVENDOR) -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER)
-	@$(shell touch $@)
+        go install $(USEMODVENDOR) -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER) && touch $@
 	$( shell if [ -d $(GOTMP) ]; then chmod -R u+w $(GOTMP); fi )
 	@echo $(VERSION) >VERSION.txt
 
