@@ -6,7 +6,7 @@ image: Windows Server 2019
 
 
 install:
-  - cinst make golang mysql-cli git
+  - cinst make golang git
 #  - cinst nssm GoogleChrome zip jq composer cmder netcat ddev
   - refreshenv
   - git config --global core.autocrlf false
