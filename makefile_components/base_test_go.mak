@@ -9,7 +9,7 @@ TESTOS = $(BUILD_OS)
 test: build
 	@echo "Testing $(SRC_AND_UNDER) with TESTARGS=$(TESTARGS)"
 	@mkdir -p $(GOTMP)/{.cache,pkg,src,bin}
-	$(DOCKERTESTCMD) \
+	@$(DOCKERTESTCMD) \
         go test $(USEMODVENDOR) -v -installsuffix static -ldflags '$(LDFLAGS)' $(SRC_AND_UNDER) $(TESTARGS)
 	$( shell if [ -d $(GOTMP) ]; then chmod -R u+w $(GOTMP); fi )
 

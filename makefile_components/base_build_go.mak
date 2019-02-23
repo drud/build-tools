@@ -71,7 +71,7 @@ build: $(BUILD_OS)
 linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
 	@mkdir -p $(GOTMP)/{.cache,pkg,src,bin}
-	$(DOCKERBUILDCMD) \
+	@$(DOCKERBUILDCMD) \
         go install -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER) && touch $@
 	$( shell if [ -d $(GOTMP) ]; then chmod -R u+w $(GOTMP); fi )
 	@echo $(VERSION) >VERSION.txt

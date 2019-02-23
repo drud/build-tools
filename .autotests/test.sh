@@ -20,11 +20,11 @@ echo "--- buildkite building ${BUILDKITE_JOB_ID:-jobid not set} at $(date) on $H
 
 # Our testbot should now be sane, run the testbot checker to make sure.
 echo "--- Checking for sane testbot"
-./.buildkite/sanetestbot.sh
+./.autotests/sanetestbot.sh
 
 echo "--- make $BUILD_OS"
 cd tests
-time make
+rm -f windows darwin linux && time make
 echo "--- make test"
 time make test
 RV=$?

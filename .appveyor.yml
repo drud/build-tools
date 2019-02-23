@@ -28,7 +28,7 @@ build_script:
 #  - sh --version
 #  - sh: echo "output from sh=$(ls -lR tests)"
 #  - which sh && sh --version
-  - cmd: .buildkite/test.cmd
+  - cmd: .autotests/test.cmd
 
 
 test: off
