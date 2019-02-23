@@ -7,7 +7,6 @@ image: Windows Server 2019
 
 install:
   - cinst make golang git
-#  - cinst nssm GoogleChrome zip jq composer cmder netcat ddev
   - refreshenv
   - git config --global core.autocrlf false
 
@@ -22,12 +21,8 @@ build_script:
 #  - where make
 #  - make --version
 #  - go version
-#  - docker version
-#  - docker-compose version
-#  - where sh
-#  - sh --version
-#  - sh: echo "output from sh=$(ls -lR tests)"
-#  - which sh && sh --version
+  - docker version && docker-compose version
+  - cmd: where docker
   - cmd: .autotests/test.cmd
 
 

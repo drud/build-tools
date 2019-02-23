@@ -63,8 +63,10 @@ endif
 # On Docker Toolbox we can't use paths like C:\xxx\xxx, must use /C/xxx/xxx
 # However, on Docker-for-Windows/Appveyor we must use C:\xxx
 ifneq ($(DOCKER_TOOLBOX_INSTALL_PATH),"")
+    $(shell echo "docker toolbox because DOCKER_TOOLBOX_INSTALL_PATH=$(DOCKER_TOOLBOX_INSTALL_PATH) )
     PWD=$(shell pwd)
 else ifeq ($(BUILD_OS),windows)
+    $(shell echo "Windows but not docker toolbox")
     PWD=$(shell cmd //c "echo %cd%")
 endif
 
