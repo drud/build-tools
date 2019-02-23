@@ -57,13 +57,15 @@ ifeq ($(BUILD_OS),windows)
     # On Windows docker toolbox, volume mounts oddly need a // at the beginning for things to work out, so
     # add that extra slash only on Windows.
     S=/
-    PWD=$(shell cmd //c "echo %cd%")
     DOCKERMOUNTFLAG=
 endif
 
 # On Docker Toolbox we can't use paths like C:\xxx\xxx, must use /C/xxx/xxx
+# However, on Docker-for-Windows/Appveyor we must use C:\xxx
 ifneq ($(DOCKER_TOOLBOX_INSTALL_PATH),"")
     PWD=$(shell pwd)
+else ifeq ($(BUILD_OS),windows)
+    PWD=$(shell cmd //c "echo %cd%")
 endif
 
 build: $(BUILD_OS)
