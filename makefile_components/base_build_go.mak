@@ -62,18 +62,18 @@ endif
 
 # On Docker Toolbox we can't use paths like C:\xxx\xxx, must use /C/xxx/xxx
 # However, on Docker-for-Windows/Appveyor we must use C:\xxx
-ifneq ($(DOCKER_TOOLBOX_INSTALL_PATH),"")
-    $(shell echo "docker toolbox because DOCKER_TOOLBOX_INSTALL_PATH=$(DOCKER_TOOLBOX_INSTALL_PATH) )
-    PWD=$(shell pwd)
+# On all other (macos/linux) $PWD will already be OK.
+ifeq ($(DOCKER_TOOLBOX_INSTALL_PATH),)
+	PWD=$(shell pwd)
 else ifeq ($(BUILD_OS),windows)
-    $(shell echo "Windows but not docker toolbox")
-    PWD=$(shell cmd //c "echo %cd%")
+	PWD=$(shell cmd //c "echo %cd%")
 endif
 
 build: $(BUILD_OS)
 
 linux darwin windows: $(GOFILES)
 	@echo "building $@ from $(SRC_AND_UNDER)"
+	@echo $(shell if [ "$(BUILD_OS)" = "windows" ]; then echo "windows build: DOCKER_TOOLBOX_INSTALL_PATH=$(DOCKER_TOOLBOX_INSTALL_PATH) PWD=$(PWD) S=$(S)"; fi )
 	@mkdir -p $(GOTMP)/{.cache,pkg,src,bin}
 	@$(DOCKERBUILDCMD) \
         go install -installsuffix static -ldflags ' $(LDFLAGS) ' $(SRC_AND_UNDER) && touch $@
