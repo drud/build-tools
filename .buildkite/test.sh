@@ -6,7 +6,7 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-set -x
+#set -x
 
 # Make sure that everything remains readable. Go module cache is always getting
 # set to read-only, meanning it can't be cleaned up.

@@ -5,16 +5,16 @@
 ##### comment about what you did and why.
 
 DOCKERBUILDCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-          	    -v "$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
-          	    -v "$(PWD)/$(GOTMP)/bin:/go/bin" \
+          	    -v "$(S)$(PWD):$(S)/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -v "$(S)$(PWD)/$(GOTMP)/bin:$(S)/go/bin" \
           	    -e CGO_ENABLED=0                  \
           	    -e GOOS=$@						  \
-          	    -e GOPATH=//workdir/$(GOTMP) \
+          	    -e GOPATH=$(S)/workdir/$(GOTMP) \
           	    -w $(S)/workdir              \
           	    $(BUILD_IMAGE)
 
 DOCKERTESTCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-          	    -v "$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -v "$(S)$(PWD):$(S)/workdir$(DOCKERMOUNTFLAG)"                              \
           	    -e GOPATH=//workdir/$(GOTMP) \
           	    -w $(S)/workdir              \
           	    $(BUILD_IMAGE)
@@ -59,6 +59,11 @@ ifeq ($(BUILD_OS),windows)
     S=/
     PWD=$(shell cmd //c "echo %cd%")
     DOCKERMOUNTFLAG=
+endif
+
+# On Docker Toolbox we can't use paths like C:\xxx\xxx, must use /C/xxx/xxx
+ifneq ($(DOCKER_TOOLBOX_INSTALL_PATH),"")
+    PWD=$(shell pwd)
 endif
 
 build: $(BUILD_OS)
