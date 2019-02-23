@@ -8,6 +8,13 @@ set -o pipefail
 set -o nounset
 set -x
 
+# Make sure that everything remains readable. Go module cache is always getting
+# set to read-only, meanning it can't be cleaned up.
+function cleanup {
+	chmod -R u+w .
+}
+trap cleanup EXIT
+
 BUILD_OS=$(go env GOOS)
 echo "--- buildkite building ${BUILDKITE_JOB_ID:-jobid not set} at $(date) on $HOSTNAME for OS=$(go env GOOS) in $PWD"
 
