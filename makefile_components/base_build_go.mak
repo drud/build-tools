@@ -56,7 +56,6 @@ USEMODVENDOR := $(shell if [ -d vendor ]; then echo "-mod=vendor"; fi)
 ifeq ($(BUILD_OS),windows)
     # On Windows docker toolbox, volume mounts oddly need a // at the beginning for things to work out, so
     # add that extra slash only on Windows.
-    S=/
     DOCKERMOUNTFLAG=
 endif
 
@@ -68,6 +67,7 @@ ifneq ($(shell if [ "$(BUILD_OS)" = "windows" ] && [ -z "$(DOCKER_TOOLBOX_INSTAL
 endif
 ifneq ($(DOCKER_TOOLBOX_INSTALL_PATH),)
 	PWD=$(shell pwd)
+    S=/
 endif
 
 build: $(BUILD_OS)
