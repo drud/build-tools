@@ -4,15 +4,12 @@ stages:
     machine:
       image: circleci/classic:201711-01
 
-    environment:
-      GOPATH: /home/circleci/go
-
     steps:
       - run: sudo rm -rf /usr/local/go &&
-             wget -q -O /tmp/golang.tgz https://dl.google.com/go/go1.11.4.linux-amd64.tar.gz &&
+             wget -q -O /tmp/golang.tgz https://dl.google.com/go/go1.11.5.linux-amd64.tar.gz &&
              sudo tar -C /usr/local -xzf /tmp/golang.tgz
 
       - checkout
 
-      - run: cd tests && make test
+      - run: .autotests/test.sh
 

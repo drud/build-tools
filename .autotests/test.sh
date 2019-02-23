@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# This script is used to build drud/build-tools using buildkite
-
+# build drud/build-tools for automated testing (buildkite/appveyor/circleci)
 
 set -o errexit
 set -o pipefail
@@ -16,7 +15,7 @@ function cleanup {
 trap cleanup EXIT
 
 BUILD_OS=$(go env GOOS)
-echo "--- buildkite building ${BUILDKITE_JOB_ID:-jobid not set} at $(date) on $HOSTNAME for OS=$(go env GOOS) in $PWD"
+echo "--- building at $(date) on $HOSTNAME for OS=$(go env GOOS) in $PWD"
 
 # Our testbot should now be sane, run the testbot checker to make sure.
 echo "--- Checking for sane testbot"
