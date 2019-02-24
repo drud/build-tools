@@ -10,7 +10,7 @@ set -o nounset
 # Make sure that everything remains readable. Go module cache is always getting
 # set to read-only, meanning it can't be cleaned up.
 function cleanup {
-	chmod -R u+w .
+	chmod -R u+w . || true
 }
 trap cleanup EXIT
 

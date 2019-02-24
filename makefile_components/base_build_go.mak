@@ -4,19 +4,21 @@
 ##### contents into ../Makefile and commenting out the include and adding a
 ##### comment about what you did and why.
 
+# The //workdir prevents docker and friends from trying to convert the thing to a non-unix path.
+# The $(S) in fromt of paths is a slash used only for Docker Toolbox, for the same reason.
 DOCKERBUILDCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-          	    -v "$(S)$(PWD):$(S)/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -v "$(S)$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
           	    -v "$(S)$(PWD)/$(GOTMP)/bin:$(S)/go/bin" \
           	    -e CGO_ENABLED=0                  \
           	    -e GOOS=$@						  \
-          	    -e GOPATH=$(S)/workdir/$(GOTMP) \
-          	    -w $(S)/workdir              \
+          	    -e GOPATH="/workdir/$(GOTMP)" \
+          	    -w //workdir              \
           	    $(BUILD_IMAGE)
 
 DOCKERTESTCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-          	    -v "$(S)$(PWD):$(S)/workdir$(DOCKERMOUNTFLAG)"                              \
-          	    -e GOPATH=//workdir/$(GOTMP) \
-          	    -w $(S)/workdir              \
+          	    -v "$(S)$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
+          	    -e GOPATH="/workdir/$(GOTMP)" \
+          	    -w //workdir              \
           	    $(BUILD_IMAGE)
 
 .PHONY: all build test push clean container-clean bin-clean version static gofmt govet golint golangci-lint container
