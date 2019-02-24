@@ -11,13 +11,13 @@ DOCKERBUILDCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)              
           	    -v "$(S)$(PWD)/$(GOTMP)/bin:$(S)/go/bin" \
           	    -e CGO_ENABLED=0                  \
           	    -e GOOS=$@						  \
-          	    -e GOPATH="/workdir/$(GOTMP)" \
+          	    -e GOPATH="//workdir/$(GOTMP)" \
           	    -w //workdir              \
           	    $(BUILD_IMAGE)
 
 DOCKERTESTCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
           	    -v "$(S)$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
-          	    -e GOPATH="/workdir/$(GOTMP)" \
+          	    -e GOPATH="//workdir/$(GOTMP)" \
           	    -w //workdir              \
           	    $(BUILD_IMAGE)
 
