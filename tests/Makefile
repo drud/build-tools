@@ -13,14 +13,6 @@ UPSTREAM_REPO ?= golang:1.7.5-alpine3.5
 
 export WORKING_DIR = $(shell pwd)
 
-TESTDOCKERCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
-          	    -v "$(S)$$PWD/$(GOTMP):/go$(DOCKERMOUNTFLAG)"                                \
-          	    -v "$(S)$$PWD:/workdir$(DOCKERMOUNTFLAG)"                              \
-          	    -v "$(S)$$PWD/$(GOTMP)/std/$@:/usr/local/go/pkg/$@_amd64_static$(DOCKERMOUNTFLAG)"  \
-          	    -w $(S)/workdir              \
-          	    $(BUILD_IMAGE)
-
-
 # Top-level directories to build - Only build the explicit complex fail stuff by default. Unit test will be overridden.
 SRC_DIRS := cmd pkg
 
@@ -76,6 +68,6 @@ test_precompile: test
 # COMMAND := govendor list
 container_cmd:
 	#@$(shell if [ -f ./go.mod ] ; then GOPATH=$$PWD/$(GOTMP) go get ./...;  fi; )
-	@$(TESTDOCKERCMD) \
+	$(DOCKERTESTCMD) \
 		$(COMMAND)
 

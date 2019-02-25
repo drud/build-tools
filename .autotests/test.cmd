@@ -1,5 +1,5 @@
-@echo "Building using bash and build.sh"
-"C:\Program Files\git\bin\bash" .buildkite/test.sh
+@echo "Building using bash and build.sh PWD=%cd%"
+"C:\Program Files\git\bin\bash" .autotests/test.sh
 
 if %ERRORLEVEL% EQU 0 (
    @echo Successful build
