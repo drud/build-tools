@@ -132,7 +132,6 @@ func TestGoVet(t *testing.T) {
 
 // Test errcheck.
 func TestErrCheck(t *testing.T) {
-	t.Skip("errcheck does not yet work with go 1.11 modules, see https://github.com/kisielk/errcheck/issues/155")
 	a := assert.New(t)
 
 	// pkg/dirtycomplex/bad_errcheck_code.go
