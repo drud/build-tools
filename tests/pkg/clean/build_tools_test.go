@@ -62,11 +62,11 @@ func TestBuild(t *testing.T) {
 	a.NoError(err, "Failed to 'make darwin'")
 	a.Contains(string(v), "building darwin")
 
-	v, err = exec.Command("make", "linux").Output()
-	a.NoError(err)
+	v, err = exec.Command("bash", "-c", "pwd && make linux").Output()
+	a.NoError(err, "failed 'make linux', err=%v, output='%v'", err, string(v))
 	a.Contains(string(v), "building linux")
 
-	v, err = exec.Command("make", "windows").Output()
+	v, err = exec.Command("bash", "-c", "pwd && make windows").Output()
 	a.NoError(err)
 	a.Contains(string(v), "building windows")
 
