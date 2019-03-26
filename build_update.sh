@@ -40,6 +40,7 @@ tar -xf $local_file
 rm -rf build-tools/*
 cp -r $internal_name/ build-tools/
 rm -rf $internal_name/
+chown -R u+w build-tools/tests/.gotmp
 rm -rf build-tools/{tests,circle.yml,.circleci,.github,.appveyor.yml,.buildkite,.autotests}
 touch build-tools/build-tools-VERSION-$tag.txt
 git add build-tools

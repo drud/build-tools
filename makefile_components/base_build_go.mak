@@ -12,6 +12,7 @@ DOCKERBUILDCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)              
           	    -e CGO_ENABLED=0                  \
           	    -e GOOS=$@						  \
           	    -e GOPATH="//workdir/$(GOTMP)" \
+          	    -e GOCACHE="//workdir/$(GOTMP)/.cache" \
           	    -e GOFLAGS="$(USEMODVENDOR)" \
           	    -w //workdir              \
           	    $(BUILD_IMAGE)
@@ -19,6 +20,7 @@ DOCKERBUILDCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)              
 DOCKERTESTCMD=docker run -t --rm -u $(shell id -u):$(shell id -g)                    \
           	    -v "$(S)$(PWD):/workdir$(DOCKERMOUNTFLAG)"                              \
           	    -e GOPATH="//workdir/$(GOTMP)" \
+          	    -e GOCACHE="//workdir/$(GOTMP)/.cache" \
           	    -e GOFLAGS="$(USEMODVENDOR)" \
           	    -w //workdir              \
           	    $(BUILD_IMAGE)
