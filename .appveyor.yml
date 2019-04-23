@@ -17,7 +17,7 @@ build_script:
   - docker version && docker-compose version
   - docker volume create --driver local --opt type=nfs test101
   - docker network create test102
-  - cmd: "c:\\Program Files\\ddev.exe"
+  - cmd: "\"c:\\Program Files\\ddev.exe\""
   - bash -c "mkdir junk && cd junk && ddev config --project-type php && ddev start"
 
 
