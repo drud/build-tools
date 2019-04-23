@@ -6,24 +6,14 @@ image: Windows Server 2019
 
 
 install:
-  - cinst make golang git
+  - cinst make golang git ddev
   - refreshenv
   - git config --global core.autocrlf false
 
 build_script:
-#  - docker run --rm -t  busybox ls /etc
-#  - docker run -t -v "C:\:/junk" busybox ls
-#  - docker run -t -v %cd%:/tmp/junk busybox ls /tmp/junk
-#  - docker run -t -v "%cd%:/tmp/junk" busybox ls /tmp/junk
-#  - ps: docker run --rm -it -v ${PWD}:/tmp/junk busybox ls /tmp/junk
-#  - where bash
-#  - bash --version
-#  - where make
-#  - make --version
-#  - go version
   - docker version && docker-compose version
-  - cmd: where docker
-  - cmd: .autotests/test.cmd
+  - docker volume create --driver local --opt type=nfs test101
+  - docker network create test102
 
 
 test: off
