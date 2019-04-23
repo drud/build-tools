@@ -19,7 +19,11 @@ build_script:
   - docker network create test102
   - bash -c "command -v ddev || echo 'ddev oddly not found in path'"
   - cmd: ddev.exe
-  - bash -c 'export PATH="$PATH:/c/program files/ddev"; mkdir junk && cd junk && ddev config --project-type php && ddev start'
+  - mkdir junk
+  - cd junk
+  - ddev config --project-type php
+  - ddev start
+#  - bash -c 'export PATH="$PATH:/c/program files/ddev"; mkdir junk && cd junk && ddev config --project-type php && ddev start'
 
 
 test: off
