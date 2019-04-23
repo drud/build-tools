@@ -17,9 +17,9 @@ build_script:
   - docker version && docker-compose version
   - docker volume create --driver local --opt type=nfs test101
   - docker network create test102
-  - bash -c "which ddev"
-  - cmd: ddev
-  - bash -c "mkdir junk && cd junk && ddev config --project-type php && ddev start"
+  - bash -c "command -v ddev || echo 'ddev oddly not found in path'"
+  - cmd: ddev.exe
+  - bash -c 'export PATH="$PATH:/c/program files/ddev"; mkdir junk && cd junk && ddev config --project-type php && ddev start'
 
 
 test: off
