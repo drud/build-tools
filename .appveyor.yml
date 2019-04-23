@@ -11,9 +11,12 @@ install:
   - git config --global core.autocrlf false
 
 build_script:
+  - ps: Switch-DockerLinux
+
   - docker version && docker-compose version
   - docker volume create --driver local --opt type=nfs test101
   - docker network create test102
+  - bash -c "ls && ls -lR"
 
 
 test: off
