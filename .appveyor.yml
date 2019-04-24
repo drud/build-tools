@@ -24,6 +24,7 @@ build_script:
   - ddev config global --instrumentation-opt-in=false
   - ddev config --project-type php
   - ddev start
+  - bash -c "ddev list"
 #  - bash -c 'export PATH="$PATH:/c/program files/ddev"; mkdir junk && cd junk && ddev config --project-type php && ddev start'
 
 
