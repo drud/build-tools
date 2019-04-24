@@ -6,7 +6,7 @@ image: Windows Server 2019
 
 
 install:
-  - cinst make golang git ddev
+  - cinst ddev make golang git
   - refreshenv
   - git config --global core.autocrlf false
 
