@@ -19,8 +19,9 @@ build_script:
   - docker network create test102
   - bash -c "command -v ddev || echo 'ddev oddly not found in path'"
   - cmd: ddev.exe
-  - mkdir junk
-  - cd junk
+  - ps: mkdir D:\junk | Out-Null
+  - D:
+  - cd \junk
   - ddev config global --instrumentation-opt-in=false
   - ddev config --project-type php
   - ddev start
