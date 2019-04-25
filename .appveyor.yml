@@ -8,19 +8,17 @@ image: Windows Server 2019
 install:
   - cinst git
   - refreshenv
+  - cmd: set PATH=C:\Program Files\git\bin;%PATH%
   - cmd: where bash
-  - cmd: set PATH=C:\Program Files\git;C:\Program Files\git\bin;%PATH%
-  - cmd: where bash
-  - cinst ddev make golang mysql-cli mkcert
+  - cinst ddev make golang mysql-cli mkcert jq
   - git config --global core.autocrlf false
   - refreshenv
 
 
 
 build_script:
-  - ps: Switch-DockerLinux
   - refreshenv
-  - cmd: set PATH=C:\Program Files\git;C:\Program Files\git\bin;%PATH%
+  - cmd: set PATH=C:\Program Files\git\bin;%PATH%
   - cmd: where bash
   - docker version && docker-compose version
 #  - docker volume create --driver local --opt type=nfs test101
@@ -41,8 +39,9 @@ build_script:
   - cd ddev
   - cmd: where bash
   - cmd: bash -c 'printf "#!/bin/bash\nexit\n" >.buildkite/nfstest.sh'
+  - ps: Switch-DockerLinux
   - cmd: .buildkite/test.cmd
-  - cmd: bash -c 'printf $PATH'
+  - cmd: bash -c "printf $PATH"
 #  - bash -c 'export PATH="$PATH:/c/program files/ddev"; mkdir junk && cd junk && ddev config --project-type php && ddev start'
 
 
