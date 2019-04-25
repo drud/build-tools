@@ -31,7 +31,7 @@ build_script:
   - cd D:\dwork
   - git clone git://github.com/drud/ddev.git
   - cd ddev
-  - make test
+  - cmd: .buildkite/test.cmd
   - bash -c "printf \"$PATH\""
 #  - bash -c 'export PATH="$PATH:/c/program files/ddev"; mkdir junk && cd junk && ddev config --project-type php && ddev start'
 
