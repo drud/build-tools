@@ -27,7 +27,7 @@ build_script:
   - icacls %TEMP% /grant everyone:f
   - mklink /J D:\user-tmp %TEMP%
   - echo %cd%
-  - cmd: mklink /J D:\ddev %PWD%
+  - cmd: mklink /J D:\ddev %cd%
   - cd D:\ddev
   - git clone git://github.com/drud/ddev.git .
   - make test
