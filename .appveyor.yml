@@ -25,6 +25,13 @@ build_script:
   - ddev config --project-type php
   - ddev start
   - bash -c "echo $PATH"
+  - icacls %TEMP% /grant everyone:f
+  - mklink /J D:\user-tmp %TEMP%
+  - echo %cd%
+  - cmd: mklink /J D:\ddev %PWD%
+  - cd D:\ddev
+  - git clone git://github.com/drud/ddev.git .
+  - make test
 #  - bash -c 'export PATH="$PATH:/c/program files/ddev"; mkdir junk && cd junk && ddev config --project-type php && ddev start'
 
 
