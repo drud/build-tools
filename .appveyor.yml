@@ -8,8 +8,9 @@ image: Windows Server 2019
 install:
   - cinst git
   - refreshenv
-  - set PATH="C:\Program Files\git;C:\Program Files\git\bin;%PATH%"
-  - where bash
+  - cmd: where bash
+  - cmd: set PATH="C:\Program Files\git;C:\Program Files\git\bin;%PATH%"
+  - cmd: where bash
   - cinst ddev make golang mysql-cli mkcert
   - git config --global core.autocrlf false
   - refreshenv
@@ -19,7 +20,7 @@ install:
 build_script:
   - ps: Switch-DockerLinux
   - refreshenv
-  - set PATH="C:\Program Files\git;C:\Program Files\git\bin;%PATH%"
+  - cmd: set PATH="C:\Program Files\git;C:\Program Files\git\bin;%PATH%"
   - cmd: where bash
   - docker version && docker-compose version
 #  - docker volume create --driver local --opt type=nfs test101
