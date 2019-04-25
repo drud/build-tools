@@ -7,13 +7,16 @@ image: Windows Server 2019
 
 install:
   - cinst ddev make golang mysql-cli nssm zip jq composer git mkcert
+  - cmd: PATH="C:\Program Files\git:%PATH%"
+  - cmd: where bash
   - refreshenv
   - git config --global core.autocrlf false
 
 build_script:
   - ps: Switch-DockerLinux
   - refreshenv
-  - cmd: where ddev.exe
+  - PATH="C:\Program Files\git:%PATH%"
+  - cmd: where bash
   - docker version && docker-compose version
 #  - docker volume create --driver local --opt type=nfs test101
 #  - docker network create test102
