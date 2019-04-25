@@ -15,8 +15,8 @@ build_script:
   - refreshenv
   - cmd: where ddev.exe
   - docker version && docker-compose version
-  - docker volume create --driver local --opt type=nfs test101
-  - docker network create test102
+#  - docker volume create --driver local --opt type=nfs test101
+#  - docker network create test102
   - bash -c "which ddev || echo 'ddev oddly not found in path'"
 #  - cmd: ddev.exe
 #  - ps: mkdir D:\junk | Out-Null
@@ -27,9 +27,10 @@ build_script:
   - icacls %TEMP% /grant everyone:f
   - mklink /J D:\user-tmp %TEMP%
   - echo %cd%
-  - cmd: mklink /J D:\ddev %cd%
-  - cd D:\ddev
-  - git clone git://github.com/drud/ddev.git .
+  - cmd: mklink /J D:\dwork %cd%
+  - cd D:\dwork
+  - git clone git://github.com/drud/ddev.git
+  - cd ddev
   - make test
   - bash -c "printf \"$PATH\""
 #  - bash -c 'export PATH="$PATH:/c/program files/ddev"; mkdir junk && cd junk && ddev config --project-type php && ddev start'
