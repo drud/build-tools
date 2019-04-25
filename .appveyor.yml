@@ -7,9 +7,10 @@ image: Windows Server 2019
 
 install:
   - cinst git
+  - refreshenv
   - set PATH="C:\Program Files\git;C:\Program Files\git\bin;%PATH%"
   - where bash
-  - cinst ddev make golang mysql-cli git mkcert
+  - cinst ddev make golang mysql-cli mkcert
   - git config --global core.autocrlf false
   - refreshenv
 
