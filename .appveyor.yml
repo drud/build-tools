@@ -17,14 +17,13 @@ build_script:
   - docker version && docker-compose version
   - docker volume create --driver local --opt type=nfs test101
   - docker network create test102
-  - bash -c "command -v ddev || echo 'ddev oddly not found in path'"
-  - cmd: ddev.exe
-  - ps: mkdir D:\junk | Out-Null
-  - ps: cd D:\junk
-  - ddev config global --instrumentation-opt-in=false
-  - ddev config --project-type php
-  - ddev start
-  - bash -c "echo $PATH"
+  - bash -c "which ddev || echo 'ddev oddly not found in path'"
+#  - cmd: ddev.exe
+#  - ps: mkdir D:\junk | Out-Null
+#  - ps: cd D:\junk
+#  - ddev config global --instrumentation-opt-in=false
+#  - ddev config --project-type php
+#  - ddev start
   - icacls %TEMP% /grant everyone:f
   - mklink /J D:\user-tmp %TEMP%
   - echo %cd%
@@ -32,6 +31,7 @@ build_script:
   - cd D:\ddev
   - git clone git://github.com/drud/ddev.git .
   - make test
+  - bash -c "printf \"$PATH\""
 #  - bash -c 'export PATH="$PATH:/c/program files/ddev"; mkdir junk && cd junk && ddev config --project-type php && ddev start'
 
 
