@@ -38,7 +38,7 @@ build_script:
   - git clone git://github.com/drud/ddev.git
   - cd ddev
   - cmd: where bash
-  - cmd: bash -c 'printf "#!/bin/bash\nexit\n" >.buildkite/nfstest.sh'
+  - cmd: bash -c 'printf "#!/bin/bash\nexit\n" >.buildkite/nfstest.sh && cat .buildkite/nfstest.sh'
   - ps: Switch-DockerLinux
   - cmd: .buildkite/test.cmd
   - cmd: bash -c "printf $PATH"
