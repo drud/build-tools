@@ -38,8 +38,8 @@ build_script:
   - git clone git://github.com/drud/ddev.git
   - cd ddev
   - cmd: where bash
-  - cmd: bash -c 'set +H; echo "#!/bin/bash" >.buildkite/nfstest.sh'
-  - cmd: bash -c "pwd && ls -l .buildkite && cat .buildkite/nfstest.sh"
+  - cmd: bash -c 'set +H; echo "#!/bin/bash" >.buildkite/nfstest.sh '
+  - cmd: bash -c "pwd && ls -l .buildkite && cat .buildkite/nfstest.sh "
   - ps: Switch-DockerLinux
   - cmd: .buildkite/test.cmd
   - cmd: bash -c "printf $PATH"
