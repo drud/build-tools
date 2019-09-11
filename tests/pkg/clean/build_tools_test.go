@@ -145,20 +145,6 @@ func TestErrCheck(t *testing.T) {
 	a.NoError(err) // Should have no complaints in clean package
 }
 
-// Test staticcheck.
-func TestStaticcheck(t *testing.T) {
-	a := assert.New(t)
-
-	// Test "make staticcheck"
-	v, err := exec.Command("bash", "-c", "make staticcheck").Output()
-	a.Error(err) // Should have one complaint about bad_staticcheck_code.go
-	a.Contains(string(v), "pkg/dirtyComplex/bad_staticcheck_code.go")
-
-	// Test "make SRC_DIRS=pkg/clean staticcheck" to limit to just clean directories
-	v, err = exec.Command("bash", "-c", "make staticcheck SRC_DIRS=pkg/clean").Output()
-	a.NoError(err, "error output from staticcheck: %v", string(v)) // Should have no complaints in clean package
-}
-
 // Test misspell.
 func TestMisspell(t *testing.T) {
 	a := assert.New(t)
