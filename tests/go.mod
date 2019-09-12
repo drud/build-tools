@@ -10,3 +10,5 @@ require (
 	golang.org/x/tools v0.0.0-20190102183724-79186431cf29 // indirect
 	honnef.co/go/tools v0.0.0-20190102075043-fe93b0e3b36b // indirect
 )
+
+go 1.13
