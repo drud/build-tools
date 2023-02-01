@@ -1,3 +1,5 @@
+# Archived: No longer maintained or useful
+
 # Build tools for standard makefile
 
 **These build tools live at https://github.com/drud/build-tools**. If you are viewing this README in any other repository, it's important to know that modifications should **never** be made directly, and instead should be made to the base repository and pulled in via the instructions below.
